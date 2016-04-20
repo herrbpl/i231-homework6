@@ -17,11 +17,17 @@ public class GraphTask {
    }
 
 
-   class Vertex {
+   /**
+    * Each Vertex has two navigational pointers. One points to next Vertex in graph
+    * Second points first Arc going out from this Vertex
+    * @author siimaus
+    *
+    */
+   class Vertex implements Iterator<Vertex>{
 
-      private String id;
-      private Vertex next;
-      private Arc first;
+      private String id; // identifier of point
+      private Vertex next; // next point in vertex list. This is top of stack.
+      private Arc first; // first arc from this point. This is top of stack.
       private int info = 0;
 
       Vertex (String s, Vertex v, Arc e) {
@@ -39,14 +45,40 @@ public class GraphTask {
          return id;
       }
 
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return (this.next != null);
+	}
+
+	@Override
+	public Vertex next() {
+		// TODO Auto-generated method stub
+		return this.next;
+	}
+
+	public boolean hasArc() {
+		return (this.first != null);
+	}
+	
+	public Arc getArc() {
+		return this.first;
+	}
       // TODO!!! Your Vertex methods here!
    }
 
 
-   class Arc {
+   /**
+    * Arc is link between two Vertex instances. Source Vertex is where Arcs originate from.
+    * Each Arc has two pointers. First is Vertex to which this Arc links to.
+    * Second is next Arc in chain.   
+    * @author siimaus
+    *
+    */
+   class Arc implements Iterator<Arc>{
 
-      private String id;
-      private Vertex target;
+      private String id; // ID of arc
+      private Vertex target; // 
       private Arc next;
       private int info = 0;
 
@@ -64,6 +96,26 @@ public class GraphTask {
       public String toString() {
          return id;
       }
+      
+    public boolean hasTarget() {
+    	return (this.target != null);
+    }
+    
+    public Vertex getTarget() {
+    	return this.target;
+    }
+
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return (this.next != null);
+	}
+
+	@Override
+	public Arc next() {
+		// TODO Auto-generated method stub
+		return this.next;
+	}
 
       // TODO!!! Your Arc methods here!
    } 
@@ -71,9 +123,9 @@ public class GraphTask {
 
    class Graph {
 
-      private String id;
-      private Vertex first;
-      private int info = 0;
+      private String id; // Graph identificator
+      private Vertex first; // stack of Vertex(es)
+      private int info = 0;  // unknown
 
       Graph (String s, Vertex v) {
          id = s;
@@ -111,6 +163,12 @@ public class GraphTask {
          return sb.toString();
       }
 
+      /**
+       * Creates new Vertex and adds it to top of Vertex stack.
+       * @param vid
+       * @return
+       * TODO: Replace direct set to setter
+       */
       public Vertex createVertex (String vid) {
          Vertex res = new Vertex (vid);
          res.next = first;
@@ -118,11 +176,18 @@ public class GraphTask {
          return res;
       }
 
+      /**
+       * Creates Arc from source Vertex to target Vertex. Created Arc will be placed to top of originating Vertex Arc stack.
+       * @param aid - Arc identificator
+       * @param from - Source Vertex
+       * @param to -- Target Vertex
+       * @return - pointer to instance of created Arc. 
+       */
       public Arc createArc (String aid, Vertex from, Vertex to) {
-         Arc res = new Arc (aid);
-         res.next = from.first;
-         from.first = res;
-         res.target = to;
+         Arc res = new Arc (aid); // new Arc
+         res.next = from.first; // Sets next element to precious top of stack
+         from.first = res; // sets TOS to newly created Arc
+         res.target = to; // sets arc target to Vertex 'to'
          return res;
       }
 
