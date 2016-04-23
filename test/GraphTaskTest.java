@@ -28,17 +28,7 @@ public class GraphTaskTest {
       
       
    }
-   
-   @Test (timeout=20000)
-   public void testGetGraph() {
-	  GraphTask gt = new GraphTask();
-      GraphTask.Graph g = gt.createGraph("root");
-      
-      GraphTask.Vertex v = g.createVertex("1");
-      assertTrue("Must be same reference as g", g == v.getGraph());
-      
-      
-   }
+  
    
 }
 
