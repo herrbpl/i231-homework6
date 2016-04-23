@@ -17,7 +17,7 @@ public class GraphTaskTest {
    @Test (timeout=20000)
    public void testVertexCount() {
 	  GraphTask gt = new GraphTask();
-      GraphTask.Graph g = gt.createGraph("root");
+      Graph g = gt.createGraph("root");
       assertEquals(0, g.vertexCount());
       g.createVertex("1");
       assertEquals(1, g.vertexCount());
