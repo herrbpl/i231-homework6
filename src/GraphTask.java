@@ -1,3 +1,4 @@
+import java.lang.reflect.Field;
 import java.util.*;
 
 public class GraphTask {
@@ -16,6 +17,9 @@ public class GraphTask {
       // TODO!!! Your experiments here
    }
 
+   public  Graph  createGraph(String gid) {
+	   return new Graph(gid);
+   }
 
    /**
     * Each Vertex has two navigational pointers. One points to next Vertex in graph
@@ -26,14 +30,15 @@ public class GraphTask {
    class Vertex implements Iterator<Vertex>{
 
       private String id; // identifier of point
-      private Vertex next; // next point in vertex list. This is top of stack.
-      private Arc first; // first arc from this point. This is top of stack.
+      private Vertex nextVertex; // next point in vertex list. This is top of stack.
+      private Arc firstArc; // first arc from this point. This is top of stack.
       private int info = 0;
+      
 
       Vertex (String s, Vertex v, Arc e) {
          id = s;
-         next = v;
-         first = e;
+         setNextVertex(v);
+         setFirstArc(e);
       }
 
       Vertex (String s) {
@@ -48,23 +53,75 @@ public class GraphTask {
 	@Override
 	public boolean hasNext() {
 		// TODO Auto-generated method stub
-		return (this.next != null);
+		return (this.getNextVertex() != null);
 	}
 
 	@Override
 	public Vertex next() {
 		// TODO Auto-generated method stub
-		return this.next;
+		return this.getNextVertex();
 	}
 
 	public boolean hasArc() {
-		return (this.first != null);
+		return (this.getFirstArc() != null);
 	}
 	
 	public Arc getArc() {
-		return this.first;
+		return this.getFirstArc();
 	}
       // TODO!!! Your Vertex methods here!
+
+	public Vertex getNextVertex() {
+		return nextVertex;
+	}
+
+	public void setNextVertex(Vertex next) {
+		this.nextVertex = next;
+	}
+
+	public Arc getFirstArc() {
+		return firstArc;
+	}
+
+	public void setFirstArc(Arc first) {
+		this.firstArc = first;
+	}
+	
+	/** 
+	 * Returns size of Vertex stack from this Vertex. 
+	 * @return
+	 */
+	public int vertexCount() {
+		int count = 0;
+		Vertex v = this;
+		while (v != null) {
+			count++;
+			v = v.getNextVertex();
+		}
+		return count;
+	}
+	
+	/**
+	 * Gets enclosing class instance, ie, Graph. 
+	 * 
+	 * @return Graph this Vertex belongs to.
+	 * @author Esko Luontula
+	 * @see <a href="http://stackoverflow.com/questions/763543/in-java-how-do-i-access-the-outer-class-when-im-not-in-the-inner-class">http://stackoverflow.com/questions/763543/in-java-how-do-i-access-the-outer-class-when-im-not-in-the-inner-class</a>
+	 */
+	public Graph getGraph() {
+		Graph result = null;
+		try {
+            Field this$0 = this.getClass().getDeclaredField("this$0");
+            result = (Graph) this$0.get(this);            
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+		return result;
+	}
+	
    }
 
 
@@ -78,14 +135,14 @@ public class GraphTask {
    class Arc implements Iterator<Arc>{
 
       private String id; // ID of arc
-      private Vertex target; // 
-      private Arc next;
+      private Vertex targetVertex; // Vertex this Arc points to. 
+      private Arc nextArc; // next Arc in stack
       private int info = 0;
 
       Arc (String s, Vertex v, Arc a) {
          id = s;
-         target = v;
-         next = a;
+         setTarget(v);
+         setNext(a);
       }
 
       Arc (String s) {
@@ -98,30 +155,42 @@ public class GraphTask {
       }
       
     public boolean hasTarget() {
-    	return (this.target != null);
+    	return (this.getTarget() != null);
     }
     
     public Vertex getTarget() {
-    	return this.target;
+    	return this.targetVertex;
     }
 
 	@Override
 	public boolean hasNext() {
 		// TODO Auto-generated method stub
-		return (this.next != null);
+		return (this.getNext() != null);
 	}
 
 	@Override
 	public Arc next() {
 		// TODO Auto-generated method stub
-		return this.next;
+		return this.getNext();
+	}
+
+	public void setTarget(Vertex target) {
+		this.targetVertex = target;
+	}
+
+	public Arc getNext() {
+		return nextArc;
+	}
+
+	public void setNext(Arc next) {
+		this.nextArc = next;
 	}
 
       // TODO!!! Your Arc methods here!
    } 
 
 
-   class Graph {
+   public  class Graph {
 
       private String id; // Graph identificator
       private Vertex first; // stack of Vertex(es)
@@ -146,32 +215,41 @@ public class GraphTask {
          while (v != null) {
             sb.append (v.toString());
             sb.append (" -->");
-            Arc a = v.first;
+            Arc a = v.getFirstArc();
             while (a != null) {
                sb.append (" ");
                sb.append (a.toString());
                sb.append (" (");
                sb.append (v.toString());
                sb.append ("->");
-               sb.append (a.target.toString());
+               sb.append (a.getTarget().toString());
                sb.append (")");
-               a = a.next;
+               a = a.getNext();
             }
             sb.append (nl);
-            v = v.next;
+            v = v.getNextVertex();
          }
          return sb.toString();
       }
 
+      /** 
+       * Returns count of Vertexes in graph
+       * @return
+       */
+      public int vertexCount() {
+    	  if (this.first == null) return 0;
+    	  return this.first.vertexCount();
+      }
+      
       /**
        * Creates new Vertex and adds it to top of Vertex stack.
-       * @param vid
+       * @param vid - vertex identification
        * @return
        * TODO: Replace direct set to setter
        */
       public Vertex createVertex (String vid) {
          Vertex res = new Vertex (vid);
-         res.next = first;
+         res.setNextVertex(first);
          first = res;
          return res;
       }
@@ -185,9 +263,9 @@ public class GraphTask {
        */
       public Arc createArc (String aid, Vertex from, Vertex to) {
          Arc res = new Arc (aid); // new Arc
-         res.next = from.first; // Sets next element to precious top of stack
-         from.first = res; // sets TOS to newly created Arc
-         res.target = to; // sets arc target to Vertex 'to'
+         res.setNext(from.getFirstArc()); // Sets next element to precious top of stack
+         from.setFirstArc(res); // sets TOS to newly created Arc
+         res.setTarget(to); // sets arc target to Vertex 'to'
          return res;
       }
 
@@ -222,19 +300,19 @@ public class GraphTask {
          Vertex v = first;
          while (v != null) {
             v.info = info++;
-            v = v.next;
+            v = v.getNextVertex();
          }
          int[][] res = new int [info][info];
          v = first;
          while (v != null) {
             int i = v.info;
-            Arc a = v.first;
+            Arc a = v.getFirstArc();
             while (a != null) {
-               int j = a.target.info;
+               int j = a.getTarget().info;
                res [i][j]++;
-               a = a.next;
+               a = a.getNext();
             }
-            v = v.next;
+            v = v.getNextVertex();
          }
          return res;
       }
@@ -260,7 +338,7 @@ public class GraphTask {
          int c = 0;
          while (v != null) {
             vert[c++] = v;
-            v = v.next;
+            v = v.getNextVertex();
          }
          int[][] connected = createAdjMatrix();
          int edgeCount = m - n + 1;  // remaining edges
