@@ -6,7 +6,7 @@ import java.util.Iterator;
  * @author siimaus
  * http://www.geeksforgeeks.org/bridge-in-a-graph/
  * https://www.udacity.com/course/viewer#!/c-cs215/l-48723544/m-48729232
- *
+ * TODO: Add methods for vertex and arc removal
  */
 interface IGraph<T, A> {
 	
@@ -30,15 +30,7 @@ interface IGraph<T, A> {
 	 * @throws IllegalArgumentException when either from or to does not exist in graph
 	 */
 	IArc<T, A> createArc( A data, IVertex<T,A> from, IVertex<T,A> to ) throws IllegalArgumentException;
-	
-	/**
-	 * Creates front and back Arcs between Vertexes from and to. 
-	 * @param data - data for Arc
-	 * @param from - originating node
-	 * @param to - destination node	 
-	 * @throws IllegalArgumentException when either from or to does not exist in graph
-	 */
-	void createEdge(A data, IVertex<T,A> from, IVertex<T,A> to ) throws IllegalArgumentException;
+		
 	
 	/** 
 	 * Returns number of IVertex in Graph

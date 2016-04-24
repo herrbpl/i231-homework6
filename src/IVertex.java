@@ -6,7 +6,8 @@ import java.util.Iterator;
  * @author siimaus
  *
  */
-interface IVertex<T, A> extends INode<T>, Iterable<IVertex<T,A>>{
+// interface IVertex<T, A> extends INode<T>, Iterable<IVertex<T,A>>{
+interface IVertex<T, A> extends INode<T>{
 	/**
 	 * Get iterator of adjacent vertices to current one.
 	 * 
@@ -14,6 +15,12 @@ interface IVertex<T, A> extends INode<T>, Iterable<IVertex<T,A>>{
 	 */
 	Iterator<IVertex<T,A>> getAdjacent();
 
+	/**
+	 * Gets all outgoing arcs from vector.
+	 * @return
+	 */
+	Iterator<IArc<T,A>> getOutgoingArcs();
+	
 	/**
 	 * Gets degree of IVertex, that means count of Arcs/Edges connected to
 	 * IVertex

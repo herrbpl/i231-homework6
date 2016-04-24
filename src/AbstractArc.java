@@ -30,8 +30,8 @@ public class AbstractArc<T, A> implements IArc<T, A> {
 		return this.data;
 	}
 
-	@Override
-	public Iterator<IArc<T, A>> iterator() {
+	//@Override
+	protected Iterator<IArc<T, A>> iterator() {
 		return new ArcIterator<T,A>(this);
 	}
 
@@ -41,8 +41,8 @@ public class AbstractArc<T, A> implements IArc<T, A> {
 		return this.targetVertex;
 	}
 
-	@Override
-	public int arcLength() {
+	//@Override
+	protected int arcLength() {
 		// TODO Auto-generated method stub
 		int length = 0;
 		
@@ -94,22 +94,27 @@ public class AbstractArc<T, A> implements IArc<T, A> {
 		return this.getValue().toString();
 	}
 
-	@Override
-	public void setTarget(IVertex<T,A> target) {
+	//@Override
+	protected void setTarget(IVertex<T,A> target) {
 		this.targetVertex = target;
 		
 	}
 
-	@Override
-	public void setNextArc(IArc<T, A> next) {
+	//@Override // Testing time
+	protected void setNextArc(IArc<T, A> next) {
 		if (next == this) throw new IllegalArgumentException("Cannot set next arc to itself!");
 		this.nextArc = next;		
 	}
 
-	@Override
-	public IArc<T, A> getNextArc() {
+	//@Override
+	protected IArc<T, A> getNextArc() {
 		// TODO Auto-generated method stub
 		return this.nextArc;
+	}
+	
+	//@Override
+	protected boolean isPartOfEdge() {
+		return false;
 	}
 	
 }

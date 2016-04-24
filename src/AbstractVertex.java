@@ -1,11 +1,13 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+
 public class AbstractVertex<T,A> implements IVertex<T,A> {
 
 	protected T data;
 	protected IVertex<T,A> nextVertex;
 	protected IArc<T,A> firstArc;
+	protected int vertexId; // indicates vertex identification in graph, should only be set by Graph
 
 	AbstractVertex(T data, IVertex<T,A> nextVertex, IArc<T,A> firstArc ) {
 		this.data = data;
@@ -29,8 +31,8 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 		return data;
 	}
 
-	@Override
-	public Iterator<IVertex<T, A>> iterator() {
+	//@Override
+	protected Iterator<IVertex<T, A>> iterator() {
 		// TODO Auto-generated method stub
 		return new VertexIterator<T,A>(this);
 	}
@@ -43,7 +45,7 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 	@Override
 	public int degree() {
 		if (this.firstArc == null) return 0;
-		return this.firstArc.arcLength();
+		return ((AbstractArc<T,A>)this.firstArc).arcLength();
 	}
 
 	
@@ -102,6 +104,27 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 	public String toString() {
 		// TODO Auto-generated method stub
 		return this.getValue().toString();
+	}
+	
+	/**
+	 * Checks if Vertex is leaf, meaning there is no outgoing arcs.
+	 * @return
+	 */
+	//@Override
+	protected boolean isLeaf() {
+		return (this.firstArc == null);		
+	}
+
+	@Override
+	public Iterator<IArc<T, A>> getOutgoingArcs() {
+		// TODO Auto-generated method stub
+		AbstractArc<T, A> a= ((AbstractArc<T, A>) this.firstArc);
+		
+		if (a == null) {
+			return null;
+		}
+		
+		return ((AbstractArc<T, A>) this.firstArc).iterator();
 	}
 	
 }

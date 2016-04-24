@@ -33,23 +33,46 @@ public class GraphTaskTest {
    public void testArc() {
 	  IArc<String, String> a = new AbstractArc<>("Test");
 	  IArc<String, String> b = new AbstractArc<>("Test2");
-	  a.setNextArc(b);
-	  System.out.println(a.arcLength());
+	  
+	  
+	  AbstractArc<String,String> x = ((AbstractArc<String,String>)a);
+	  AbstractArc<String,String> y = ((AbstractArc<String,String>)b);
+	  AbstractArc<String,String> z = new AbstractArc<String, String>("test3");
+	  
+	  x.setNextArc(y);
+	  y.setNextArc(z);
+	  System.out.println(x.arcLength());
      
-	 Iterator<IArc<String, String>> ai = a.iterator();
+	 Iterator<IArc<String, String>> ai = x.iterator();
 	 
 	 
 	 if (ai != null) {
 		 IArc<String, String> n;
 		 while (ai.hasNext()) {
 			 n = ai.next();
-			 n.getTarget().getValue();
-			 n.toString();
+			 
+			 System.out.println(n.toString());
 		 }
 		 
 	 }
 	
    }
-   
+
+   @Test //(timeout=20000)
+   public void testGraph() {
+	   AbstractGraph<String,String> g = new AbstractGraph<String,String>("root");
+	   IVertex<String, String> v1,v2, v3;
+	   
+	   v1 = g.createVertex("v1");
+	   v2 = g.createVertex("v2");
+	   v3 = g.createVertex("v3");
+	   
+	   g.createArc("a" + v1.toString()+"_"+v2.toString(), v1, v2);
+	   g.createArc("a" + v1.toString()+"_"+v3.toString(), v1, v3);
+	   g.createArc("a" + v3.toString()+"_"+v2.toString(), v3, v2);
+	   
+	   System.out.println(g);
+	   System.out.println(g.getAdjacencyMatrixString());   
+   }
 }
 

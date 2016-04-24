@@ -105,7 +105,7 @@ public class Graph {
 				return;
 			Vertex[] varray = new Vertex[n];
 			for (int i = 0; i < n; i++) {
-				varray[i] = createVertex("v" + String.valueOf(n - i));
+				varray[i] = createVertex("v" + String.valueOf(n - i)); // old b inserts vertices here with reverse order!!!
 				if (i > 0) {
 					int vnr = (int) (Math.random() * i);
 					createArc("a" + varray[vnr].toString() + "_" + varray[i].toString(), varray[vnr], varray[i]);
