@@ -1,52 +1,8 @@
 import java.util.Iterator;
 
-/**
- * Graph class. Graph has payload of class T. Idea is to do all operations (like DFS, BFS, etc.) outside of graph itself. I don't know, whether this is good idea.
- * @author siimaus
- * http://www.geeksforgeeks.org/bridge-in-a-graph/
- * https://www.udacity.com/course/viewer#!/c-cs215/l-48723544/m-48729232
- *
- */
 
-interface IGraph<T, A> {
-	
-	/**
-	 * Returns iterable of all vertices in graph
-	 * @return
-	 */
-	Iterator<IVertex<T>> vertices();
-	/**
-	 * Adds Vertex to Graph 
-	 * @param data - Data object that Vertex contains
-	 * @return returns created IVertex<T> object
-	 */
-	IVertex<T> createVertex(T data);	
-	/**
-	 * Adds IArc<A> from IVertex<T> from to IVertex<T> to  
-	 * @param data - data for Arc
-	 * @param from - originating node
-	 * @param to - destination node
-	 * @return returns created IArc<A> object
-	 * @throws IllegalArgumentException when either from or to does not exist in graph
-	 */
-	IArc<A> createArc( A data, IVertex<T> from, IVertex<T> to ) throws IllegalArgumentException;
-	
-	/**
-	 * Creates front and back Arcs between Vertexes from and to. 
-	 * @param data - data for Arc
-	 * @param from - originating node
-	 * @param to - destination node	 
-	 * @throws IllegalArgumentException when either from or to does not exist in graph
-	 */
-	void createEdge(A data, IVertex<T> from, IVertex<T> to ) throws IllegalArgumentException;
-	
-	/** 
-	 * Returns number of IVertex in Graph
-	 * @return
-	 */
-	int verticesCount();
-	
-}
+
+
 
 public class Graph {
 
@@ -61,7 +17,7 @@ public class Graph {
 		}
 
 		Graph(String s) {
-			this(s, null);
+			this(s, null);			
 		}
 
 		@Override

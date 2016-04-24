@@ -1,40 +1,5 @@
 
 
-/**
- * Interface for Arc connecting two nodes.
- * @author siimaus
- *
- */
-interface IArc<T> {
-	/**
-	 * Gets target of this Arc
-	 * @return IVertex<T> indicated by this arc
-	 */
-	IVertex<T> getTarget();
-	/**
-	 * Sets value to Arc
-	 * @param newValue
-	 */
-	void setValue(T newValue);
-	/**
-	 * Gets value of Arc
-	 * @return
-	 */
-	T getValue();
-	
-	/**
-	 * Returns total length of arc from this point on.
-	 * @return
-	 */
-	int arcLength();
-	
-	
-	/**
-	 * Gets next Arc in chain
-	 * @return
-	 */
-	IArc<T> next();
-}
 
 
 /**

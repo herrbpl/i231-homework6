@@ -29,6 +29,27 @@ public class GraphTaskTest {
       
    }
   
+   @Test (timeout=20000)
+   public void testArc() {
+	  IArc<String, String> a = new AbstractArc<>("Test");
+	  IArc<String, String> b = new AbstractArc<>("Test2");
+	  a.setNextArc(b);
+	  System.out.println(a.arcLength());
+     
+	 Iterator<IArc<String, String>> ai = a.iterator();
+	 
+	 
+	 if (ai != null) {
+		 IArc<String, String> n;
+		 while (ai.hasNext()) {
+			 n = ai.next();
+			 n.getTarget().getValue();
+			 n.toString();
+		 }
+		 
+	 }
+	
+   }
    
 }
 
