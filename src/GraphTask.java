@@ -2,6 +2,26 @@
 import java.util.*;
 
 public class GraphTask {
+	
+	/**
+	 * Data structure to hold Edge (Pair of vertex 1 and vertex 2)
+	 * @author siimaus
+	 *
+	 */
+	public class Edge {
+		protected Vertex a,b;
+		
+		Edge(Vertex from, Vertex to ) {
+			if (a == null || b == null) { throw new IllegalArgumentException("Edge vertex cannot be null"); }
+			this.a = from;
+			this.b = to;
+		}
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return String.format("e{%s->%s}", a.id, b.id);
+		}
+	}
 
 	public static void main(String[] args) {
 		GraphTask a = new GraphTask();
@@ -35,12 +55,13 @@ public class GraphTask {
 									// stack.
 		private Arc firstArc; // first arc from this point. This is top of
 								// stack.
-		private int info = 0;
+		private int info = 0;		
 
-		Vertex(String s, Vertex v, Arc e) {
-			id = s;
-			setNextVertex(v);
-			setFirstArc(e);
+		Vertex(String id, Vertex v, Arc e) {
+			if (id == null) { throw new IllegalArgumentException("Vertex id must not be null!"); }
+			this.id = id;
+			this.nextVertex = v;
+			this.firstArc = e;
 		}
 
 		Vertex(String s) {
@@ -53,28 +74,7 @@ public class GraphTask {
 		}
 
 		public boolean hasArc() {
-			return (this.getFirstArc() != null);
-		}
-
-		public Arc getArc() {
-			return this.getFirstArc();
-		}
-		// TODO!!! Your Vertex methods here!
-
-		public Vertex getNextVertex() {
-			return nextVertex;
-		}
-
-		public void setNextVertex(Vertex next) {
-			this.nextVertex = next;
-		}
-
-		public Arc getFirstArc() {
-			return firstArc;
-		}
-
-		public void setFirstArc(Arc first) {
-			this.firstArc = first;
+			return (this.firstArc != null);
 		}
 
 		/**
@@ -87,9 +87,40 @@ public class GraphTask {
 			Vertex v = this;
 			while (v != null) {
 				count++;
-				v = v.getNextVertex();
+				v = v.nextVertex;
 			}
 			return count;
+		}
+		
+		/** 
+		 * Returns iterator over adjacent vertexes
+		 * @return iterator over adjacent vertexes, can be empty
+		 */
+		public Iterator<Vertex> getAdjacentVertexes() {
+			return null;
+		}
+		
+		public Iterator<Arc> getOutArcs() {
+			if (this.firstArc == null) {
+				return new Iterator<Arc>() {
+					
+					@Override
+					public Arc next() {
+						// TODO Auto-generated method stub
+						throw new NoSuchElementException("No such element!");						
+					}
+					
+					@Override
+					public boolean hasNext() {
+						// TODO Auto-generated method stub						
+						return false;
+					}
+				};
+				
+			} else {
+				return this.firstArc.iterator();
+			}
+				
 		}
 
 	}
@@ -102,7 +133,7 @@ public class GraphTask {
 	 * @author siimaus
 	 *
 	 */
-	class Arc  {
+	class Arc implements Iterable<Arc> {
 
 		private String id; // ID of arc
 		private Vertex targetVertex; // Vertex this Arc points to.
@@ -111,8 +142,8 @@ public class GraphTask {
 
 		Arc(String s, Vertex v, Arc a) {
 			id = s;
-			setTarget(v);
-			setNextArc(a);
+			this.targetVertex = v;
+			this.nextArc = a;
 		}
 
 		Arc(String s) {
@@ -122,26 +153,32 @@ public class GraphTask {
 		@Override
 		public String toString() {
 			return id;
-		}
+		}		
 
-		public boolean hasTarget() {
-			return (this.getTarget() != null);
-		}
+		@Override
+		public Iterator<Arc> iterator() {
+			final Arc self = this;
+			// TODO Auto-generated method stub
+			return new Iterator<Arc>() {
+				
+				private Arc current = self;
+				
 
-		public Vertex getTarget() {
-			return this.targetVertex;
-		}
-
-		public void setTarget(Vertex target) {
-			this.targetVertex = target;
-		}
-
-		public Arc getNextArc() {
-			return nextArc;
-		}
-
-		public void setNextArc(Arc next) {
-			this.nextArc = next;
+				@Override
+				public Arc next() {
+					if (!hasNext()) { throw new NoSuchElementException("Next element not found!"); }
+					// TODO Auto-generated method stub
+					Arc result = current;
+					current = current.nextArc;
+					return result;
+				}
+				
+				@Override
+				public boolean hasNext() {					
+					return (current != null);
+				}
+								
+			};
 		}
 
 		// TODO!!! Your Arc methods here!
@@ -172,19 +209,19 @@ public class GraphTask {
 			while (v != null) {
 				sb.append(v.toString());
 				sb.append(" -->");
-				Arc a = v.getFirstArc();
+				Arc a = v.firstArc;
 				while (a != null) {
 					sb.append(" ");
 					sb.append(a.toString());
 					sb.append(" (");
 					sb.append(v.toString());
 					sb.append("->");
-					sb.append(a.getTarget().toString());
+					sb.append(a.targetVertex.toString());
 					sb.append(")");
-					a = a.getNextArc();
+					a = a.nextArc;
 				}
 				sb.append(nl);
-				v = v.getNextVertex();
+				v = v.nextVertex;
 			}
 			return sb.toString();
 		}
@@ -195,6 +232,7 @@ public class GraphTask {
 		 * @return
 		 */
 		public int vertexCount() {
+			
 			if (this.first == null)
 				return 0;
 			return this.first.vertexCount();
@@ -209,7 +247,7 @@ public class GraphTask {
 		 */
 		public Vertex createVertex(String vid) {
 			Vertex res = new Vertex(vid);
-			res.setNextVertex(first);
+			res.nextVertex = first;
 			first = res;
 			return res;
 		}
@@ -228,10 +266,10 @@ public class GraphTask {
 		 */
 		public Arc createArc(String aid, Vertex from, Vertex to) {
 			Arc res = new Arc(aid); // new Arc
-			res.setNextArc(from.getFirstArc()); // Sets next element to precious
+			res.nextArc = from.firstArc; // Sets next element to precious
 												// top of stack
-			from.setFirstArc(res); // sets TOS to newly created Arc
-			res.setTarget(to); // sets arc target to Vertex 'to'
+			from.firstArc = res; // sets TOS to newly created Arc
+			res.targetVertex = to; // sets arc target to Vertex 'to'
 			return res;
 		}
 
@@ -268,19 +306,19 @@ public class GraphTask {
 			Vertex v = first;
 			while (v != null) {
 				v.info = info++;
-				v = v.getNextVertex();
+				v = v.nextVertex;
 			}
 			int[][] res = new int[info][info];
 			v = first;
 			while (v != null) {
 				int i = v.info;
-				Arc a = v.getFirstArc();
+				Arc a = v.firstArc;
 				while (a != null) {
-					int j = a.getTarget().info;
+					int j = a.targetVertex.info;
 					res[i][j]++;
-					a = a.getNextArc();
+					a = a.nextArc;
 				}
-				v = v.getNextVertex();
+				v = v.nextVertex;
 			}
 			return res;
 		}
@@ -312,7 +350,7 @@ public class GraphTask {
 				maxLen = Math.max(columns[pos].length(), maxLen);
 				sb.append(sep).append(columns[pos]); // add to header
 				sep = "|";
-				v = v.getNextVertex();
+				v = v.nextVertex;
 			}
 			
 			sb.insert(0,  padLeft("|", maxLen+1, " ")).append("\n");
@@ -357,7 +395,7 @@ public class GraphTask {
 			int c = 0;
 			while (v != null) {
 				vert[c++] = v;
-				v = v.getNextVertex();
+				v = v.nextVertex;
 			}
 			int[][] connected = createAdjMatrix();
 			int edgeCount = m - n + 1; // remaining edges
@@ -379,6 +417,8 @@ public class GraphTask {
 		}
 
 		// TODO!!! Your Graph methods here!
+		
+		
 	}
 
 }
