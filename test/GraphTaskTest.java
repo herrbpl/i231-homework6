@@ -84,6 +84,6 @@ public class GraphTaskTest {
 		assertEquals("Components count must be 1", 1, g.componentsCount());		
 		System.out.println(g);
 		System.out.println(g.getAdjMatrix());
-		
+		g.findBridges();
 	}
 }

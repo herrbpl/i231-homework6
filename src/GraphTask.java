@@ -2,20 +2,24 @@
 import java.util.*;
 
 public class GraphTask {
-	
+
 	/**
 	 * Data structure to hold Edge (Pair of vertex 1 and vertex 2)
+	 * 
 	 * @author siimaus
 	 *
 	 */
 	public class Edge {
-		protected Vertex a,b;
-		
-		Edge(Vertex from, Vertex to ) {
-			if (a == null || b == null) { throw new IllegalArgumentException("Edge vertex cannot be null"); }
+		protected Vertex a, b;
+
+		Edge(Vertex from, Vertex to) {
+			if (a == null || b == null) {
+				throw new IllegalArgumentException("Edge vertex cannot be null");
+			}
 			this.a = from;
 			this.b = to;
 		}
+
 		@Override
 		public String toString() {
 			// TODO Auto-generated method stub
@@ -48,18 +52,21 @@ public class GraphTask {
 	 * @author siimaus
 	 *
 	 */
-	class Vertex  {
+	class Vertex {
 
 		private String id; // identifier of point
 		private Vertex nextVertex; // next point in vertex list. This is top of
 									// stack.
 		private Arc firstArc; // first arc from this point. This is top of
 								// stack.
-		private int info = 0;		
-		private int componentId = -1; // indicates to which component vertex belongs to. -1 - not calculated. 
+		private int info = 0;
+		private int componentId = -1; // indicates to which component vertex
+										// belongs to. -1 - not calculated.
 
 		Vertex(String id, Vertex v, Arc e) {
-			if (id == null) { throw new IllegalArgumentException("Vertex id must not be null!"); }
+			if (id == null) {
+				throw new IllegalArgumentException("Vertex id must not be null!");
+			}
 			this.id = id;
 			this.nextVertex = v;
 			this.firstArc = e;
@@ -72,7 +79,7 @@ public class GraphTask {
 		@Override
 		public String toString() {
 			return id;
-		}		
+		}
 
 		/**
 		 * Returns size of Vertex stack from this Vertex.
@@ -88,33 +95,34 @@ public class GraphTask {
 			}
 			return count;
 		}
-		
+
 		/**
 		 * Gets Iterator over outgoing Arcs, giving us adjacent vertexes.
+		 * 
 		 * @return Iterator over outgoing Arcs
 		 */
-		
+
 		public Iterator<Arc> getOutArcs() {
 			if (this.firstArc == null) {
 				return new Iterator<Arc>() {
-					
+
 					@Override
 					public Arc next() {
 						// TODO Auto-generated method stub
-						throw new NoSuchElementException("No such element!");						
+						throw new NoSuchElementException("No such element!");
 					}
-					
+
 					@Override
 					public boolean hasNext() {
-						// TODO Auto-generated method stub						
+						// TODO Auto-generated method stub
 						return false;
 					}
 				};
-				
+
 			} else {
 				return this.firstArc.iterator();
 			}
-				
+
 		}
 
 	}
@@ -147,31 +155,32 @@ public class GraphTask {
 		@Override
 		public String toString() {
 			return id;
-		}		
+		}
 
 		@Override
 		public Iterator<Arc> iterator() {
 			final Arc self = this;
 			// TODO Auto-generated method stub
 			return new Iterator<Arc>() {
-				
+
 				private Arc current = self;
-				
 
 				@Override
 				public Arc next() {
-					if (!hasNext()) { throw new NoSuchElementException("Next element not found!"); }
+					if (!hasNext()) {
+						throw new NoSuchElementException("Next element not found!");
+					}
 					// TODO Auto-generated method stub
 					Arc result = current;
 					current = current.nextArc;
 					return result;
 				}
-				
+
 				@Override
-				public boolean hasNext() {					
+				public boolean hasNext() {
 					return (current != null);
 				}
-								
+
 			};
 		}
 
@@ -183,18 +192,19 @@ public class GraphTask {
 		private String id; // Graph identificator
 		private Vertex first; // stack of Vertex(es)
 		private int info = 0; // unknown
-		
-		private int connectedComponents = -1; 
+
+		private int connectedComponents = -1;
 		private Vertex[] components = new Vertex[0]; // Components in graph
-		private int componentVertexIndex[] = new int[0]; // vertexes in each component
+		private int componentVertexIndex[] = new int[0]; // vertexes in each
+															// component
 
 		Graph(String s, Vertex v) {
 			id = s;
-			first = v;			
+			first = v;
 		}
 
 		Graph(String s) {
-			this(s, null);			
+			this(s, null);
 		}
 
 		@Override
@@ -230,7 +240,7 @@ public class GraphTask {
 		 * @return
 		 */
 		public int vertexCount() {
-			
+
 			if (this.first == null)
 				return 0;
 			return this.first.vertexCount();
@@ -266,7 +276,7 @@ public class GraphTask {
 		public Arc createArc(String aid, Vertex from, Vertex to) {
 			Arc res = new Arc(aid); // new Arc
 			res.nextArc = from.firstArc; // Sets next element to precious
-												// top of stack
+											// top of stack
 			from.firstArc = res; // sets TOS to newly created Arc
 			res.targetVertex = to; // sets arc target to Vertex 'to'
 			connectedComponents = -1;
@@ -329,45 +339,46 @@ public class GraphTask {
 			}
 			return s;
 		}
-		
+
 		/**
 		 * Returns Adj Matrix as nicely formatted string
 		 * 
-		 * @return Adj Matrix as string
-		 * TODO: remove double loops
+		 * @return Adj Matrix as string TODO: remove double loops
 		 */
 		public String getAdjMatrix() {
 			int[][] mat = this.createAdjMatrix();
 			StringBuilder sb = new StringBuilder();
 			String[] columns = new String[this.vertexCount()];
-			
+
 			Vertex v = this.first;
-			 int pos = -1; int maxLen = 0; String sep = ""; int totLen = 0;
-			while (v != null) {				
-				
+			int pos = -1;
+			int maxLen = 0;
+			String sep = "";
+			int totLen = 0;
+			while (v != null) {
+
 				pos++;
-				columns[pos] = " "+v.toString()+" ";
+				columns[pos] = " " + v.toString() + " ";
 				maxLen = Math.max(columns[pos].length(), maxLen);
 				sb.append(sep).append(columns[pos]); // add to header
 				sep = "|";
 				v = v.nextVertex;
 			}
-			
-			sb.insert(0,  padLeft("|", maxLen+1, " ")).append("\n");
+
+			sb.insert(0, padLeft("|", maxLen + 1, " ")).append("\n");
 			totLen = sb.length();
 			sb.append(padLeft("", totLen, "-")).append("\n");
-			
+
 			for (int i = 0; i < mat.length; i++) {
 				sep = "";
 				sb.append(columns[i]).append("|");
 				for (int j = 0; j < mat.length; j++) {
 					String val = String.valueOf(mat[i][j]);
-					sb.append(sep).append(padLeft(val, columns[i].length() - val.length(), " " )).append(" ");
+					sb.append(sep).append(padLeft(val, columns[i].length() - val.length(), " ")).append(" ");
 					sep = "|";
 				}
-				sb.append("\n");				
+				sb.append("\n");
 			}
-			
 
 			return sb.toString();
 		}
@@ -417,15 +428,15 @@ public class GraphTask {
 		}
 
 		// TODO!!! Your Graph methods here!
-		
+
 		/**
-		 *  get graph connected components
+		 * get graph connected components
 		 */
 		private void findGraphComponents() {
 			final Graph self = this;
 			Object i = new Object() {
-				Graph g = self;				
-				 				
+				Graph g = self;
+
 				@Override
 				public String toString() {
 					// TODO Auto-generated method stub
@@ -433,9 +444,9 @@ public class GraphTask {
 					connect();
 					return "";
 				}
-				
+
 				/**
-				 *  Reset graph info
+				 * Reset graph info
 				 */
 				void reset() {
 					int info = 0;
@@ -446,80 +457,170 @@ public class GraphTask {
 						v = v.nextVertex;
 					}
 					g.connectedComponents = 0;
-					g.components  = new Vertex[info+1];
-					g.componentVertexIndex  = new int[info+1];
+					g.components = new Vertex[info + 1];
+					g.componentVertexIndex = new int[info + 1];
 				}
+
 				/**
-				 *  Searches for connected nodes.
-				 *  @seealso <a href="http://algs4.cs.princeton.edu/41graph/CC.java.html">http://algs4.cs.princeton.edu/41graph/CC.java.html</a>
-				 */				 
+				 * Searches for connected nodes.
+				 * 
+				 * @seealso <a href=
+				 *          "http://algs4.cs.princeton.edu/41graph/CC.java.html">
+				 *          http://algs4.cs.princeton.edu/41graph/CC.java.html
+				 *          </a>
+				 */
 				void connect() {
 					Vertex v = g.first;
-					
+
 					while (v != null) {
-						if (v.componentId == -1) {																
-							dfs(v);							
-							g.connectedComponents++; // new component							
+						if (v.componentId == -1) {
+							dfs(v);
+							g.connectedComponents++; // new component
 						}
 						v = v.nextVertex;
 					}
-																																		
+
 				}
-				
+
 				/**
-				 *  DFS searching connected components
-				 *  
+				 * DFS searching connected components
+				 * 
 				 * @param v
-				 * @see  <a href="http://algs4.cs.princeton.edu/41graph/CC.java.html">http://algs4.cs.princeton.edu/41graph/CC.java.html</a>
+				 * @see <a href=
+				 *      "http://algs4.cs.princeton.edu/41graph/CC.java.html">
+				 *      http://algs4.cs.princeton.edu/41graph/CC.java.html</a>
 				 */
 				void dfs(Vertex v) {
-					
-					v.componentId = g.connectedComponents; // set vertex component id					
-					g.componentVertexIndex[g.connectedComponents]++; // number of vertices in component										
-					
-					
+
+					v.componentId = g.connectedComponents; // set vertex
+															// component id
+					g.componentVertexIndex[g.connectedComponents]++; // number
+																		// of
+																		// vertices
+																		// in
+																		// component
+
 					// previous count
 					if (g.connectedComponents > 0) {
-						g.components[g.componentVertexIndex[g.connectedComponents-1]+g.componentVertexIndex[g.connectedComponents]] = v;
+						g.components[g.componentVertexIndex[g.connectedComponents - 1]
+								+ g.componentVertexIndex[g.connectedComponents]] = v;
 					} else {
 						g.components[g.componentVertexIndex[g.connectedComponents]] = v;
 					}
-					
-					
+
 					Iterator<Arc> iter = v.getOutArcs();
 					while (iter.hasNext()) {
 						Vertex next = iter.next().targetVertex;
-						
+
 						// if there actually is target vertex..
-						if (next != null && next.componentId == -1) {  
+						if (next != null && next.componentId == -1) {
 							dfs(next);
 						}
 					}
 				}
-				
+
 			};
-			i.toString();			
+			i.toString();
 		}
-		
+
+		/**
+		 * Finds number of connected components in graph.
+		 * 
+		 * @return Number of connected components in graph
+		 */
 		public int componentsCount() {
 			if (this.connectedComponents < 0) {
 				findGraphComponents();
 			}
-			return this.connectedComponents;			
+			return this.connectedComponents;
 		}
-		
+
 		/**
 		 * Find bridges in Graph. We expect graph to be undirected.
 		 * 
-		 * @see <a href="http://algs4.cs.princeton.edu/41graph/Bridge.java.html">http://algs4.cs.princeton.edu/41graph/Bridge.java.html</a>
+		 * @see <a href=
+		 *      "http://algs4.cs.princeton.edu/41graph/Bridge.java.html">http://
+		 *      algs4.cs.princeton.edu/41graph/Bridge.java.html</a>
 		 */
 		public void findBridges() {
-			
+			final Graph self = this;
+			Object i = new Object() {
+				Graph g = self;
+
+				int vertexCount = g.vertexCount();
+				int[] pre = new int[vertexCount];
+				int[] low = new int[vertexCount];
+				int count = 0;// counter of dfs execution cycles.
+
+				@Override
+				public String toString() {
+					reset();
+					search();
+					return "";
+				}
+
+				void reset() {					
+					int info = 0;
+					Vertex v = g.first;
+					while (v != null) {
+						v.info = info++;
+						low[v.info] = -1;
+						pre[v.info] = -1;
+						v = v.nextVertex;						
+					}										
+				}
+				/**
+				 * Search for bridges
+				 */
+				void search() {
+					Vertex v = g.first;
+					while (v != null) {	
+						if (pre[v.info] == -1) {
+							dfs(v,v);
+						}
+						v = v.nextVertex;
+					}								       
+				}
+				/**
+				 * DFS called in search mechanism recursively.
+				 * @param u
+				 * @param v
+				 */
+				void dfs(Vertex u, Vertex v) {
+					pre[v.info] = count++; // increased cycle
+					low[v.info] = pre[v.info]; // For this vertex, 
+					
+					// for each outgoing arc
+					Iterator<Arc> iter = v.getOutArcs();
+					while (iter.hasNext()) {
+						Vertex next = iter.next().targetVertex;
+						// if there actually is target vertex..
+						if (next != null) {
+						   if (pre[next.info] == -1) { // not visited yet
+							   dfs(v, next); // recursive, now v is parent and next is vertex examined
+							   low[v.info] = Math.min(low[v.info], low[next.info]); // update minimal steps required to reach v. dfs might have found another, better way.
+							   
+							   if (low[next.info] == pre[next.info]) { // found a bridge.
+								   System.out.println(v.id+"-"+next.id + " is a bridge!");
+							   }
+							   
+						   } else { // next is already visited by something. 
+							   
+							   if (next.info != u.info) { // if this vertex is not where we reached to v from
+								   low[v.info] = Math.min(low[v.info], pre[next.info]); // set minimal number of steps know required to reach v
+							   }
+						   }
+							
+						}
+					}
+					
+				}
+				
+			};
+			i.toString();
+
 		}
-		
-		
+
 	}
-	
-	
 
 }
