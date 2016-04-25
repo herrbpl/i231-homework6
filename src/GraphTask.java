@@ -44,7 +44,7 @@ public class GraphTask<T,A> {
 	 *            number of vertices added to this graph
 	 */
 	@SuppressWarnings("unchecked")
-	public void createRandomTree(IGraph<T,A> g, int n) {		
+	public  void createRandomTree(IGraph<T,A> g, int n) {		
 		if (n <= 0)
 			return;
 		

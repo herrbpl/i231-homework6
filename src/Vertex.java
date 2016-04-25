@@ -2,87 +2,158 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 
+class VertexIterator<T ,A>  implements Iterator<IVertex<T,A>> {
 
-
-
-
-/**
- * Each Vertex has two navigational pointers. One points to next Vertex in graph
- * Second points first Arc going out from this Vertex
- * 
- * @author siimaus
- *
- */
-public class Vertex {
-
-	private String id; // identifier of Vertex
-	private Vertex nextVertex; // next point in vertex list. This is top of
-								// stack.
-	private Arc firstArc; // first arc from this point. This is top of
-							// stack.
-	private int info = 0;
-
-	Vertex(String s, Vertex v, Arc e) {
-		id = s;
-		setNextVertex(v);
-		setFirstArc(e);
+	private IVertex<T,A> currentVertex = null;
+	private IArc<T,A> currentArc = null;
+	private int iteratorType = 0;
+	
+	public VertexIterator(IVertex<T,A> first) {
+		iteratorType = 1; 
+		currentVertex = first;			
+	}		
+	
+	public VertexIterator(IArc<T,A> first) {
+		iteratorType = 2; 
+		currentArc = first;			
 	}
-
-	Vertex(String s) {
-		this(s, null, null);
+	
+	/**
+	 * Constructor to return empty iterator of specified type
+	 * @param iteratorType
+	 */
+	public VertexIterator(int iteratorType) {
+		if (iteratorType <= 0 || iteratorType > 2)  throw new RuntimeException("Invalid iterator type!");
+		this.iteratorType = iteratorType; 				
+	}
+	
+	@Override
+	public boolean hasNext() {	
+		if (iteratorType == 1) return (currentVertex != null); 
+		if (iteratorType == 2) return (currentArc != null);
+		return false;
 	}
 
 	@Override
+	public IVertex<T, A> next() {
+		if (!hasNext()) throw new  NoSuchElementException();
+								
+		IVertex<T,A> result = null;
+		
+		if (iteratorType == 1) {
+		
+			result = currentVertex;						
+			currentVertex = ((Vertex<T,A>)currentVertex).nextVertex;
+		} else if (iteratorType == 2) {
+			result = currentArc.getTarget();
+			// I think I should remove this from interface, thus i used type casting here.
+			currentArc = ((Arc<T,A>)currentArc).nextArc; 
+			
+		} else {
+			throw new RuntimeException("Invalid iterator type!");
+		}
+		return result;
+	}
+	
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+	
+}
+
+/**
+ * Vertex object. Indicates node in graph. Holds payload data.
+ * Each Vertex has two navigational pointers. One points to next Vertex in graph
+ * Second points first Arc going out from this Vertex 
+ * 
+ * @author siimaus
+ *
+ * @param <T> - Type for Vertex class payload
+ * @param <A> - Type for Arc class payload
+ */
+public class Vertex<T,A> implements IVertex<T,A> {
+
+	protected T data;
+	protected IVertex<T,A> nextVertex;
+	protected IArc<T,A> firstArc;
+	protected int vertexId; // indicates vertex identification in graph, should only be set by Graph
+
+	Vertex(T data, IVertex<T,A> nextVertex, IArc<T,A> firstArc ) {
+		this.data = data;
+		this.nextVertex = nextVertex;
+		this.firstArc = firstArc;
+	}
+	
+	Vertex(T data) {
+		this(data, null, null);
+	}
+	
+	@Override
+	public void setValue(T newValue) {
+		// TODO Auto-generated method stub
+		data = newValue;
+	}
+
+	@Override
+	public T getValue() {
+		// TODO Auto-generated method stub
+		return data;
+	}
+
+	//@Override
+	protected Iterator<IVertex<T, A>> iterator() {
+		// TODO Auto-generated method stub
+		return new VertexIterator<T,A>(this);
+	}
+
+	@Override
+	public Iterator<IVertex<T, A>> getAdjacent() {
+		if (this.firstArc == null) return new VertexIterator<T,A>(2); 
+		return new VertexIterator<T,A>(this.firstArc);
+	}
+
+	@Override
+	public int degree() {
+		if (this.firstArc == null) return 0;
+		return ((Arc<T,A>)this.firstArc).arcLength();
+	}
+
+	
+	
+	
+	@Override
 	public String toString() {
-		return id;
+		// TODO Auto-generated method stub
+		if (this.getValue() == null) return "";
+		return this.getValue().toString();
 	}
-
-	public boolean hasArc() {
-		return (this.getFirstArc() != null);
-	}
-
-	public Arc getArc() {
-		return this.getFirstArc();
-	}
-	// TODO!!! Your Vertex methods here!
-
-	public Vertex getNextVertex() {
-		return nextVertex;
-	}
-
-	public void setNextVertex(Vertex next) {
-		this.nextVertex = next;
-	}
-
-	public Arc getFirstArc() {
-		return firstArc;
-	}
-
-	public void setFirstArc(Arc first) {
-		this.firstArc = first;
-	}
-
+	
 	/**
-	 * Returns size of Vertex stack from this Vertex.
-	 * 
+	 * Checks if Vertex is leaf, meaning there is no outgoing arcs.
 	 * @return
 	 */
-	public int vertexCount() {
-		int count = 0;
-		Vertex v = this;
-		while (v != null) {
-			count++;
-			v = v.getNextVertex();
+	//@Override
+	protected boolean isLeaf() {
+		return (this.firstArc == null);		
+	}
+
+	@Override
+	public Iterator<IArc<T, A>> getOutgoingArcs() {
+		// TODO Auto-generated method stub
+		Arc<T, A> a= ((Arc<T, A>) this.firstArc);
+		
+		if (a == null) {
+			return new ArcIterator<T,A>(null); 
 		}
-		return count;
+		
+		return ((Arc<T, A>) this.firstArc).iterator();
 	}
 
-	public int getInfo() {
-		return info;
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		this.firstArc = null;
 	}
-
-	public void setInfo(int info) {
-		this.info = info;
-	}
-
+	
 }

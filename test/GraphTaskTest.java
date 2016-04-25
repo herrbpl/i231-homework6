@@ -31,13 +31,13 @@ public class GraphTaskTest {
   
    @Test (timeout=20000)
    public void testArc() {
-	  IArc<String, String> a = new AbstractArc<>("Test");
-	  IArc<String, String> b = new AbstractArc<>("Test2");
+	  IArc<String, String> a = new Arc<>("Test");
+	  IArc<String, String> b = new Arc<>("Test2");
 	  
 	  
-	  AbstractArc<String,String> x = ((AbstractArc<String,String>)a);
-	  AbstractArc<String,String> y = ((AbstractArc<String,String>)b);
-	  AbstractArc<String,String> z = new AbstractArc<String, String>("test3");
+	  Arc<String,String> x = ((Arc<String,String>)a);
+	  Arc<String,String> y = ((Arc<String,String>)b);
+	  Arc<String,String> z = new Arc<String, String>("test3");
 	  
 	  x.setNextArc(y);
 	  y.setNextArc(z);
@@ -60,7 +60,7 @@ public class GraphTaskTest {
    
    @Test (expected = RuntimeException.class)
    public void testArcItself() {
-	   AbstractArc<String,String> z = new AbstractArc<String, String>("test3");
+	   Arc<String,String> z = new Arc<String, String>("test3");
 	   z.setNextArc(z);
    }
 

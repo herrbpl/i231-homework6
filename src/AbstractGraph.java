@@ -1,5 +1,12 @@
 import java.util.Iterator;
 
+/**
+ * Base class for graph, implements most basic graph handling methods. 
+ * @author siimaus
+ *
+ * @param <T>
+ * @param <A>
+ */
 public class AbstractGraph<T,A> implements IGraph<T, A> {
 
 	protected String id;
@@ -14,13 +21,13 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 	public Iterator<IVertex<T, A>> vertices() {
 		// TODO Auto-generated method stub
 		if (this.firstVertex == null) return new VertexIterator<T,A>(1);  
-		return ((AbstractVertex<T,A>)firstVertex).iterator();
+		return ((Vertex<T,A>)firstVertex).iterator();
 	}
 
 	@Override
 	public IVertex<T, A> createVertex(T data) {
 		// TODO Auto-generated method stub
-		AbstractVertex<T, A> v = new AbstractVertex<T, A>(data);
+		Vertex<T, A> v = new Vertex<T, A>(data);
 		v.vertexId = this.vertexCount++;
 		v.nextVertex = this.firstVertex;
 		this.firstVertex = v;
@@ -33,9 +40,9 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 		if (!existsVertex(from)) throw new IllegalArgumentException("Vertex 'from' does not exist in graph");
 		if (!existsVertex(to)) throw new IllegalArgumentException("Vertex 'to' does not exist in graph");
 		
-		AbstractArc<T,A> arc = new AbstractArc<T, A>(data);		
-		arc.nextArc = ((AbstractVertex<T,A>)from).firstArc;		
-		((AbstractVertex<T,A>)from).firstArc = arc;		
+		Arc<T,A> arc = new Arc<T, A>(data);		
+		arc.nextArc = ((Vertex<T,A>)from).firstArc;		
+		((Vertex<T,A>)from).firstArc = arc;		
 		arc.targetVertex = to;		
 		return arc;
 	}	
@@ -124,7 +131,7 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 		vertexCount = 0;
 		while(i.hasNext()) {			
 			v = i.next();			
-			((AbstractVertex<T,A>)v).vertexId = vertexCount;
+			((Vertex<T,A>)v).vertexId = vertexCount;
 			vertexCount++;
 		}
 		
@@ -144,7 +151,7 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 		while(i.hasNext()) {
 			v = i.next();
 			
-			ii = ((AbstractVertex<T,A>)v).vertexId;
+			ii = ((Vertex<T,A>)v).vertexId;
 			System.out.printf("VERTEX[ %s %d ]\n", v, ii );
 			j = v.getOutgoingArcs();
 			
@@ -153,7 +160,7 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 			
 				a = j.next();
 				if (a.getTarget() != null) {
-				   jj = ((AbstractVertex<T,A>)a.getTarget()).vertexId;
+				   jj = ((Vertex<T,A>)a.getTarget()).vertexId;
 				   res[ii][jj]++;
 				}
 				

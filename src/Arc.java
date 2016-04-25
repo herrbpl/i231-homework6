@@ -1,5 +1,39 @@
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
+class ArcIterator<T,A>  implements Iterator<IArc<T,A>> {
 
+	private IArc<T,A> current;
+	
+	public ArcIterator(IArc<T,A> first) {
+		current = first;
+		
+	}
+	
+	
+	@Override
+	public boolean hasNext() {			
+		return (current != null);
+	}
+
+	@Override
+	public IArc<T, A> next() {
+		if (!hasNext()) throw new  NoSuchElementException();
+		
+		IArc<T,A> result;
+		result = current;	
+		
+		// I think i will not expose internal moving mecanisms through interface, so typecasting here.
+		current = ((Arc<T,A>)current).nextArc;						
+		return result;
+	}
+	
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+	
+}
 
 
 /**
@@ -10,47 +44,89 @@
  * @author siimaus
  *
  */
-class Arc {
+public class Arc<T, A> implements IArc<T, A> {
 
-	private String id; // ID of arc
-	private Vertex targetVertex; // Vertex this Arc points to.
-	private Arc nextArc; // next Arc in stack
-	private int info = 0;
-
-	Arc(String s, Vertex v, Arc a) {
-		id = s;
-		setTarget(v);
-		setNextArc(a);
+	protected A data;
+	protected IVertex<T,A> targetVertex;
+	protected IArc<T,A> nextArc;
+	
+	Arc (A data, IVertex<T,A> target, IArc<T,A> next  ) {
+		this.data = data;
+		this.targetVertex = target;
+		this.nextArc = next;
 	}
+	
+	Arc (A data) {
+		this(data, null, null);
+	}
+	
+	@Override
+	public void setValue(A newValue) {
+		// TODO Auto-generated method stub
+		this.data = newValue;
 
-	Arc(String s) {
-		this(s, null, null);
 	}
 
 	@Override
-	public String toString() {
-		return id;
+	public A getValue() {
+		// TODO Auto-generated method stub
+		return this.data;
 	}
 
-	public boolean hasTarget() {
-		return (this.getTarget() != null);
+	//@Override
+	protected Iterator<IArc<T, A>> iterator() {
+		return new ArcIterator<T,A>(this);
 	}
 
-	public Vertex getTarget() {
+	@Override
+	public IVertex<T,A> getTarget() {
+		// TODO Auto-generated method stub
 		return this.targetVertex;
 	}
 
-	public void setTarget(Vertex target) {
+	//@Override
+	protected int arcLength() {
+		// TODO Auto-generated method stub
+		int length = 0;
+		
+		Iterator<IArc<T,A>> iterator = this.iterator();
+		while(iterator.hasNext()) {
+			length++;
+			iterator.next();
+		}
+		
+		return length;
+	}
+	
+	
+	
+	@Override
+	public String toString() {		
+		if (this.getValue() == null) return "";
+		return this.getValue().toString();
+	}
+
+	//@Override
+	protected void setTarget(IVertex<T,A> target) {
 		this.targetVertex = target;
+		
 	}
 
-	public Arc getNextArc() {
-		return nextArc;
+	//@Override // Testing time
+	protected void setNextArc(IArc<T, A> next) {
+		if (next == this) throw new IllegalArgumentException("Cannot set next arc to itself!");
+		this.nextArc = next;		
 	}
 
-	public void setNextArc(Arc next) {
-		this.nextArc = next;
+	//@Override
+	protected IArc<T, A> getNextArc() {
+		// TODO Auto-generated method stub
+		return this.nextArc;
 	}
-
-	// TODO!!! Your Arc methods here!
+	
+	//@Override
+	protected boolean isPartOfEdge() {
+		return false;
+	}
+	
 }
