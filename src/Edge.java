@@ -1,7 +1,7 @@
 
 /**
  * Edge class. This created for convinience of UndirectedGraph so that edges can
- * be iterated, for example to list bridges.
+ * be iterated, for example to list bridges. 
  * 
  * @author siimaus
  *
@@ -11,6 +11,8 @@
 public class Edge<T, A> {
 	protected IVertex<T, A> v1, v2;
 	protected IArc<T, A> a1, a2;
+	
+	
 	
 	Edge(IVertex<T, A>v1, IVertex<T, A> v2, IArc<T, A> a1, IArc<T, A> a2 ) {
 		this.v1 = v1;
