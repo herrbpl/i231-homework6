@@ -56,6 +56,7 @@ public class GraphTask {
 		private Arc firstArc; // first arc from this point. This is top of
 								// stack.
 		private int info = 0;		
+		private int componentId = -1; // indicates to which component vertex belongs to. -1 - not calculated. 
 
 		Vertex(String id, Vertex v, Arc e) {
 			if (id == null) { throw new IllegalArgumentException("Vertex id must not be null!"); }
@@ -71,11 +72,7 @@ public class GraphTask {
 		@Override
 		public String toString() {
 			return id;
-		}
-
-		public boolean hasArc() {
-			return (this.firstArc != null);
-		}
+		}		
 
 		/**
 		 * Returns size of Vertex stack from this Vertex.
@@ -92,13 +89,10 @@ public class GraphTask {
 			return count;
 		}
 		
-		/** 
-		 * Returns iterator over adjacent vertexes
-		 * @return iterator over adjacent vertexes, can be empty
+		/**
+		 * Gets Iterator over outgoing Arcs, giving us adjacent vertexes.
+		 * @return Iterator over outgoing Arcs
 		 */
-		public Iterator<Vertex> getAdjacentVertexes() {
-			return null;
-		}
 		
 		public Iterator<Arc> getOutArcs() {
 			if (this.firstArc == null) {
@@ -189,14 +183,18 @@ public class GraphTask {
 		private String id; // Graph identificator
 		private Vertex first; // stack of Vertex(es)
 		private int info = 0; // unknown
+		
+		private int connectedComponents = -1; 
+		private Vertex[] components = new Vertex[0]; // Components in graph
+		private int componentVertexIndex[] = new int[0]; // vertexes in each component
 
 		Graph(String s, Vertex v) {
 			id = s;
-			first = v;
+			first = v;			
 		}
 
 		Graph(String s) {
-			this(s, null);
+			this(s, null);			
 		}
 
 		@Override
@@ -249,6 +247,7 @@ public class GraphTask {
 			Vertex res = new Vertex(vid);
 			res.nextVertex = first;
 			first = res;
+			connectedComponents = -1;
 			return res;
 		}
 
@@ -270,6 +269,7 @@ public class GraphTask {
 												// top of stack
 			from.firstArc = res; // sets TOS to newly created Arc
 			res.targetVertex = to; // sets arc target to Vertex 'to'
+			connectedComponents = -1;
 			return res;
 		}
 
@@ -418,7 +418,108 @@ public class GraphTask {
 
 		// TODO!!! Your Graph methods here!
 		
+		/**
+		 *  get graph connected components
+		 */
+		private void findGraphComponents() {
+			final Graph self = this;
+			Object i = new Object() {
+				Graph g = self;				
+				 				
+				@Override
+				public String toString() {
+					// TODO Auto-generated method stub
+					reset();
+					connect();
+					return "";
+				}
+				
+				/**
+				 *  Reset graph info
+				 */
+				void reset() {
+					int info = 0;
+					Vertex v = g.first;
+					while (v != null) {
+						v.info = info++;
+						v.componentId = -1;
+						v = v.nextVertex;
+					}
+					g.connectedComponents = 0;
+					g.components  = new Vertex[info+1];
+					g.componentVertexIndex  = new int[info+1];
+				}
+				/**
+				 *  Searches for connected nodes.
+				 *  @seealso <a href="http://algs4.cs.princeton.edu/41graph/CC.java.html">http://algs4.cs.princeton.edu/41graph/CC.java.html</a>
+				 */				 
+				void connect() {
+					Vertex v = g.first;
+					
+					while (v != null) {
+						if (v.componentId == -1) {																
+							dfs(v);							
+							g.connectedComponents++; // new component							
+						}
+						v = v.nextVertex;
+					}
+																																		
+				}
+				
+				/**
+				 *  DFS searching connected components
+				 *  
+				 * @param v
+				 * @see  <a href="http://algs4.cs.princeton.edu/41graph/CC.java.html">http://algs4.cs.princeton.edu/41graph/CC.java.html</a>
+				 */
+				void dfs(Vertex v) {
+					
+					v.componentId = g.connectedComponents; // set vertex component id					
+					g.componentVertexIndex[g.connectedComponents]++; // number of vertices in component										
+					
+					
+					// previous count
+					if (g.connectedComponents > 0) {
+						g.components[g.componentVertexIndex[g.connectedComponents-1]+g.componentVertexIndex[g.connectedComponents]] = v;
+					} else {
+						g.components[g.componentVertexIndex[g.connectedComponents]] = v;
+					}
+					
+					
+					Iterator<Arc> iter = v.getOutArcs();
+					while (iter.hasNext()) {
+						Vertex next = iter.next().targetVertex;
+						
+						// if there actually is target vertex..
+						if (next != null && next.componentId == -1) {  
+							dfs(next);
+						}
+					}
+				}
+				
+			};
+			i.toString();			
+		}
+		
+		public int componentsCount() {
+			if (this.connectedComponents < 0) {
+				findGraphComponents();
+			}
+			return this.connectedComponents;			
+		}
+		
+		/**
+		 * Find bridges in Graph. We expect graph to be undirected.
+		 * 
+		 * @see <a href="http://algs4.cs.princeton.edu/41graph/Bridge.java.html">http://algs4.cs.princeton.edu/41graph/Bridge.java.html</a>
+		 */
+		public void findBridges() {
+			
+		}
+		
 		
 	}
+	
+	
 
 }

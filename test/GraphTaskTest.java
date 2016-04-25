@@ -60,4 +60,30 @@ public class GraphTaskTest {
 		
 
 	}
+	
+	@Test //(timeout = 20000)
+	public void testConnectedComponents() {
+		GraphTask gt = new GraphTask();
+		GraphTask.Graph g = gt.createGraph("root");
+		GraphTask.Vertex v1, v2, v3;
+		v1 = g.createVertex("v1");
+
+		v2 = g.createVertex("v2");
+
+		v3 = g.createVertex("v3");
+
+		assertEquals("Components count must be 3", 3, g.componentsCount());
+				
+		g.createArc("a_v1_v2", v1, v2);
+		g.createArc("a_v2_v1", v2, v1);
+		
+		assertEquals("Components count must be 2", 2, g.componentsCount());		
+		g.createArc("a_v1_v3", v1, v3);
+		g.createArc("a_v3_v1", v3, v1);
+		
+		assertEquals("Components count must be 1", 1, g.componentsCount());		
+		System.out.println(g);
+		System.out.println(g.getAdjMatrix());
+		
+	}
 }
