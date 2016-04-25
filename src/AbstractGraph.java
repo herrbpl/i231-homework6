@@ -91,12 +91,9 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 			sb.append(" -->");
 			
 			j = v.getOutgoingArcs();
+						
 			
-			if (j == null) {
-				System.out.println("WTF!?");
-			}
-			
-			while(j != null && j.hasNext()) {
+			while(j.hasNext()) {
 				a = j.next();				
 				
 				sb.append(" ");
@@ -152,7 +149,7 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 			j = v.getOutgoingArcs();
 			
 						
-			while(j != null && j.hasNext()) {
+			while(j.hasNext()) {
 			
 				a = j.next();
 				if (a.getTarget() != null) {

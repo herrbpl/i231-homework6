@@ -18,13 +18,13 @@ public class GraphTaskTest {
    public void testVertexCount() {
 	  GraphTask gt = new GraphTask();
       Graph g = gt.createGraph("root");
-      assertEquals(0, g.vertexCount());
+      assertEquals(0, g.verticesCount());
       g.createVertex("1");
-      assertEquals(1, g.vertexCount());
+      assertEquals(1, g.verticesCount());
       g.createVertex("2");
-      assertEquals(2, g.vertexCount());
+      assertEquals(2, g.verticesCount());
       g.createVertex("3");
-      assertEquals(3, g.vertexCount());
+      assertEquals(3, g.verticesCount());
       
       
    }
@@ -57,7 +57,23 @@ public class GraphTaskTest {
 	 }
 	
    }
+   
+   @Test (expected = RuntimeException.class)
+   public void testArcItself() {
+	   AbstractArc<String,String> z = new AbstractArc<String, String>("test3");
+	   z.setNextArc(z);
+   }
 
+   @Test //(timeout=20000)
+   public void testGraphTaskcreateRandomTree() {
+	   AbstractGraph<String, String> g = new AbstractGraph<String, String>("Root");
+	   GraphTask gt = new GraphTask();
+	   gt.createRandomTree(g, 9);
+	   System.out.println(g);
+	   System.out.println(g.getAdjacencyMatrixString());
+	   assertEquals("Vertex count must be 9", 9, g.verticesCount());
+   }
+   
    @Test //(timeout=20000)
    public void testGraph() {
 	   AbstractGraph<String,String> g = new AbstractGraph<String,String>("root");

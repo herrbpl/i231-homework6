@@ -93,6 +93,7 @@ public class AbstractArc<T, A> implements IArc<T, A> {
 	
 	@Override
 	public String toString() {		
+		if (this.getValue() == null) return "";
 		return this.getValue().toString();
 	}
 

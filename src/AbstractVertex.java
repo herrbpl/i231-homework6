@@ -62,6 +62,13 @@ class VertexIterator<T ,A>  implements Iterator<IVertex<T,A>> {
 	
 }
 
+/**
+ * Vertex object. Indicates node in graph. Holds payload data. 
+ * @author siimaus
+ *
+ * @param <T> - Type for Vertex class payload
+ * @param <A> - Type for Arc class payload
+ */
 public class AbstractVertex<T,A> implements IVertex<T,A> {
 
 	protected T data;
@@ -115,6 +122,7 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
+		if (this.getValue() == null) return "";
 		return this.getValue().toString();
 	}
 	
