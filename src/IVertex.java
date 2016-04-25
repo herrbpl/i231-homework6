@@ -29,5 +29,9 @@ interface IVertex<T, A> extends INode<T>{
 	 */
 	int degree();
 
+	/**
+	 * Removes all outgoing arcs from vertex.
+	 */
+	void clear();
 	
 }

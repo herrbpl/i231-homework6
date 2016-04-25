@@ -126,5 +126,11 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 		
 		return ((AbstractArc<T, A>) this.firstArc).iterator();
 	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		this.firstArc = null;
+	}
 	
 }

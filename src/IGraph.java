@@ -36,6 +36,12 @@ interface IGraph<T, A> {
 	 * Returns number of IVertex in Graph
 	 * @return
 	 */
+	
 	int verticesCount();
+	
+	/**
+	 * Removes all vertices from graph. 
+	 */
+	void clear();
 	
 }

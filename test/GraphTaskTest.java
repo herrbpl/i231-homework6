@@ -72,7 +72,14 @@ public class GraphTaskTest {
 	   g.createArc("a" + v3.toString()+"_"+v2.toString(), v3, v2);
 	   
 	   System.out.println(g);
-	   System.out.println(g.getAdjacencyMatrixString());   
+	   System.out.println(g.getAdjacencyMatrixString());
+	   assertEquals("Must be equal", 3, g.verticesCount());
+	   
+	   g.clear();
+	   
+	   assertEquals("Must be equal", 0, g.verticesCount());
+	   System.out.println(g);
+	   System.out.println(g.getAdjacencyMatrixString());
    }
 }
 

@@ -220,5 +220,18 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 		return sb.toString();
 	}
 
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		Iterator<IVertex<T,A>> iter = this.vertices();
+		IVertex<T,A> v = null;
+		while(iter.hasNext()) {
+			v = iter.next();
+			v.clear();
+		}
+		this.firstVertex = null;
+		this.vertexCount=0;
+	}
+
 	
 }
