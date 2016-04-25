@@ -2,6 +2,66 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 
+class VertexIterator<T ,A>  implements Iterator<IVertex<T,A>> {
+
+	private IVertex<T,A> currentVertex = null;
+	private IArc<T,A> currentArc = null;
+	private int iteratorType = 0;
+	
+	public VertexIterator(IVertex<T,A> first) {
+		iteratorType = 1; 
+		currentVertex = first;			
+	}		
+	
+	public VertexIterator(IArc<T,A> first) {
+		iteratorType = 2; 
+		currentArc = first;			
+	}
+	
+	/**
+	 * Constructor to return empty iterator of specified type
+	 * @param iteratorType
+	 */
+	public VertexIterator(int iteratorType) {
+		if (iteratorType <= 0 || iteratorType > 2)  throw new RuntimeException("Invalid iterator type!");
+		this.iteratorType = iteratorType; 				
+	}
+	
+	@Override
+	public boolean hasNext() {	
+		if (iteratorType == 1) return (currentVertex != null); 
+		if (iteratorType == 2) return (currentArc != null);
+		return false;
+	}
+
+	@Override
+	public IVertex<T, A> next() {
+		if (!hasNext()) throw new  NoSuchElementException();
+								
+		IVertex<T,A> result = null;
+		
+		if (iteratorType == 1) {
+		
+			result = currentVertex;						
+			currentVertex = ((AbstractVertex<T,A>)currentVertex).nextVertex;
+		} else if (iteratorType == 2) {
+			result = currentArc.getTarget();
+			// I think I should remove this from interface, thus i used type casting here.
+			currentArc = ((AbstractArc<T,A>)currentArc).nextArc; 
+			
+		} else {
+			throw new RuntimeException("Invalid iterator type!");
+		}
+		return result;
+	}
+	
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+	
+}
+
 public class AbstractVertex<T,A> implements IVertex<T,A> {
 
 	protected T data;
@@ -38,7 +98,8 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 	}
 
 	@Override
-	public Iterator<IVertex<T, A>> getAdjacent() {		
+	public Iterator<IVertex<T, A>> getAdjacent() {
+		if (this.firstArc == null) return new VertexIterator<T,A>(2); 
 		return new VertexIterator<T,A>(this.firstArc);
 	}
 
@@ -49,56 +110,7 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 	}
 
 	
-	protected class VertexIterator<T ,A>  implements Iterator<IVertex<T,A>> {
-
-		private IVertex<T,A> currentVertex = null;
-		private IArc<T,A> currentArc = null;
-		private int iteratorType = 0;
-		
-		public VertexIterator(IVertex<T,A> first) {
-			iteratorType = 1; 
-			currentVertex = first;			
-		}		
-		
-		public VertexIterator(IArc<T,A> first) {
-			iteratorType = 2; 
-			currentArc = first;			
-		}
-		
-		@Override
-		public boolean hasNext() {	
-			if (iteratorType == 1) return (currentVertex != null); 
-			if (iteratorType == 2) return (currentArc != null);
-			return false;
-		}
-
-		@Override
-		public IVertex<T, A> next() {
-			if (!hasNext()) throw new  NoSuchElementException();
-									
-			IVertex<T,A> result = null;
-			
-			if (iteratorType == 1) {
-			
-				result = currentVertex;						
-				currentVertex = ((AbstractVertex<T,A>)currentVertex).nextVertex;
-			} else if (iteratorType == 2) {
-				result = currentArc.getTarget();
-				// I think I should remove this from interface, thus i used type casting here.
-				currentArc = ((AbstractArc<T,A>)currentArc).nextArc; 
-				
-			} else {
-				throw new RuntimeException("Invalid iterator type!");
-			}
-			return result;
-		}
-		
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-		
-	}
+	
 	
 	@Override
 	public String toString() {
@@ -121,7 +133,7 @@ public class AbstractVertex<T,A> implements IVertex<T,A> {
 		AbstractArc<T, A> a= ((AbstractArc<T, A>) this.firstArc);
 		
 		if (a == null) {
-			return null;
+			return new ArcIterator<T,A>(null); 
 		}
 		
 		return ((AbstractArc<T, A>) this.firstArc).iterator();

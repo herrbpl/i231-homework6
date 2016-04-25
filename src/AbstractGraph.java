@@ -13,6 +13,7 @@ public class AbstractGraph<T,A> implements IGraph<T, A> {
 	@Override
 	public Iterator<IVertex<T, A>> vertices() {
 		// TODO Auto-generated method stub
+		if (this.firstVertex == null) return new VertexIterator<T,A>(1);  
 		return ((AbstractVertex<T,A>)firstVertex).iterator();
 	}
 

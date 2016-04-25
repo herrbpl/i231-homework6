@@ -1,6 +1,40 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+class ArcIterator<T,A>  implements Iterator<IArc<T,A>> {
+
+	private IArc<T,A> current;
+	
+	public ArcIterator(IArc<T,A> first) {
+		current = first;
+		
+	}
+	
+	
+	@Override
+	public boolean hasNext() {			
+		return (current != null);
+	}
+
+	@Override
+	public IArc<T, A> next() {
+		if (!hasNext()) throw new  NoSuchElementException();
+		
+		IArc<T,A> result;
+		result = current;	
+		
+		// I think i will not expose internal moving mecanisms through interface, so typecasting here.
+		current = ((AbstractArc<T,A>)current).nextArc;						
+		return result;
+	}
+	
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+	
+}
+
 public class AbstractArc<T, A> implements IArc<T, A> {
 
 	protected A data;
@@ -55,39 +89,7 @@ public class AbstractArc<T, A> implements IArc<T, A> {
 		return length;
 	}
 	
-	protected class ArcIterator<T,A>  implements Iterator<IArc<T,A>> {
-
-		private IArc<T,A> current;
-		
-		public ArcIterator(IArc<T,A> first) {
-			current = first;
-			
-		}
-		
-		
-		@Override
-		public boolean hasNext() {			
-			return (current != null);
-		}
-
-		@Override
-		public IArc<T, A> next() {
-			if (!hasNext()) throw new  NoSuchElementException();
-			
-			IArc<T,A> result;
-			result = current;	
-			
-			// I think i will not expose internal moving mecanisms through interface, so typecasting here.
-			current = ((AbstractArc<T,A>)current).nextArc;						
-			return result;
-		}
-		
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-		
-	}
+	
 	
 	@Override
 	public String toString() {		
