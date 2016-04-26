@@ -1,5 +1,6 @@
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 /**
  * This class runs given tasks on Graph
  * My given task was to find all bridges in undirected simple graph.
@@ -12,8 +13,38 @@ public class GraphTask {
 	
 
 	public static void main(String[] args) {
+		
+		List<String> params = Arrays.asList(args);
+		if (params.contains("-h")) {
+			System.out.println("Usage: GraphTask <number of test|-h> <number of test> ..");
+			System.out.println("Number of test: 1-6");
+			System.out.println("Without parameters, all tests are executed sequently.");			
+			return;
+		}
+		
 		GraphTask a = new GraphTask();
-		a.run();		
+		
+		if (params.isEmpty()) {
+			params = new ArrayList<String>();
+			params.add("1");
+			params.add("2");
+			params.add("3");
+			params.add("4");
+			params.add("5");
+			params.add("6");
+		}
+		
+		for (String param : params) {
+			if (param.equals("1")) a.test1();
+			if (param.equals("2")) a.test2();
+			if (param.equals("3")) a.test3();
+			if (param.equals("4")) a.test4();
+			if (param.equals("5")) a.test5();
+			if (param.equals("6")) a.test6();
+		}
+		
+		//GraphTask a = new GraphTask();
+		//a.run();		
 	}
 
 	public void run() {
@@ -21,6 +52,7 @@ public class GraphTask {
 		g.createRandomSimpleGraph(6, 9);
 		System.out.println(g);
 		System.out.println(g.getAdjMatrix());
+		
 		// TODO!!! Your experiments here
 	}
 
@@ -28,14 +60,225 @@ public class GraphTask {
 	 * Test case 1. 
 	 */
 	public void test1() {
+		System.out.println("Test1.");
+		System.out.println("Antakse ette kolme tipuga graaf (A,B,D), kus puuduvad servad.\n "
+				+ "Programm peab kuvama graafi ja sildade arvuks null.");
+		Graph g = createGraph("test1");
 		
+		g.createVertex("A");
+		g.createVertex("B");
+		g.createVertex("C");
+		
+		System.out.println("Graaf:"+ g);
+		System.out.printf("Sildade arv: %d\n", g.bridgeCount());
+		System.out.println("Külgnevusmaatriks");
+		System.out.println(g.getAdjMatrix());
 	}
 	
 	/**
 	 * test case 2
 	 */
 	public void test2() {
+		System.out.println("Test2.");
+		System.out.println("Antakse ette kolme tipuga (A,B,C) graaf kus on servad E(A,B) ja E(B,C).\n"
+				+ "Programm peab kuvama graafi ja leidma 2 silda E(A,B) ja E(B,C).");
+		Graph g = createGraph("test2");
 		
+		g.createVertex("A");
+		g.createVertex("B");
+		g.createVertex("C");
+		
+		g.createEdge("A",  "B");
+		g.createEdge("B",  "C");
+		
+		System.out.println("Graaf:"+ g);
+		System.out.printf("Sildade arv: %d\n", g.bridgeCount());
+		
+		System.out.println("Sillad:");
+		Iterator<Edge> iter = g.bridges();
+		
+		while (iter.hasNext()) {
+			System.out.println(iter.next());
+		}
+		
+		System.out.println("Külgnevusmaatriks");
+		System.out.println(g.getAdjMatrix());
+		
+	}
+	
+	/**
+	 * test case 3
+	 */
+	public void test3() {
+		System.out.println("Test3.");
+		System.out.println("Antakse ette viie tipuga graaf (A,B,C,D,E) kus on servad \n"
+				+ "E(A,B), E(B,C), E(C,A), E(A,D), E(D,E). Programm peab kuvama graafi \n"
+				+ "ja leidma 2 silda E(A,D), E(D,E).");
+		Graph g = createGraph("test3");
+		
+		
+		g.createVertex("A");
+		g.createVertex("B");
+		g.createVertex("C");
+		g.createVertex("D");
+		g.createVertex("E");
+		
+		g.createEdge("A",  "B");
+		g.createEdge("B",  "C");
+		g.createEdge("C",  "A");
+		g.createEdge("A",  "D");
+		g.createEdge("D",  "E");
+		
+		System.out.println("Graaf:"+ g);
+		System.out.printf("Sildade arv: %d\n", g.bridgeCount());
+		
+		System.out.println("Sillad:");
+		Iterator<Edge> iter = g.bridges();
+		
+		while (iter.hasNext()) {
+			System.out.println(iter.next());
+		}
+		
+		System.out.println("Külgnevusmaatriks");
+		System.out.println(g.getAdjMatrix());
+		
+	}
+	
+	/**
+	 * test case 4
+	 */
+	public void test4() {
+		System.out.println("Test4.");
+		System.out.println("Antakse ette viie tipuga graaf (A,B,C,D,E) kus on servad\n"
+				+ "E(A,B), E(B,C), E(C,A), E(A,D), E(D,E), E(E,A), E(C,E). Programm\n"
+				+ "peab kuvama graafi ja ei tohi leida ühtegi silda.");
+		Graph g = createGraph("test4");
+		
+		g.createVertex("A");
+		g.createVertex("B");
+		g.createVertex("C");
+		g.createVertex("D");
+		g.createVertex("E");
+		
+		g.createEdge("A",  "B");
+		g.createEdge("B",  "C");
+		g.createEdge("C",  "A");
+		g.createEdge("A",  "D");
+		g.createEdge("D",  "E");
+		g.createEdge("E",  "A");
+		g.createEdge("C",  "E");
+		
+		System.out.println("Graaf:"+ g);
+		System.out.printf("Sildade arv: %d\n", g.bridgeCount());
+		
+		System.out.println("Sillad:");
+		Iterator<Edge> iter = g.bridges();
+		
+		while (iter.hasNext()) {
+			System.out.println(iter.next());
+		}
+		
+		System.out.println("Külgnevusmaatriks");
+		System.out.println(g.getAdjMatrix());
+		
+	}
+	
+
+	/**
+	 * test case 5
+	 */
+	public void test5() {
+		System.out.println("Test5.");
+		System.out.println("Programm genereerib 6 tipuga sidusa orienteerimata graafi\n"
+				+ "millesse genereerib 9 juhuslikku serva. Programm peab kuvama graafi,\n"
+				+ "külgnevusmaatriksi ning leidma sildade arvu graafis ja need välja tooma.\n"
+				+ "Seejärel peab programm eemaldama ühe sildadest ja leidma komponentide\n"
+				+ "arvu graafis ning kuvama graafi ja külgnevusmaatriksi peale sildade eemaldamist.");
+		Graph g = createGraph("test5");
+		
+		while (g.bridgeCount() == 0) {
+			g.clear();
+			g.createRandomSimpleGraph(6, 9);
+		}
+				
+		System.out.println("Graaf:"+ g);
+		System.out.printf("Sildade arv: %d\n", g.bridgeCount());
+		
+		System.out.println("Sillad:");
+		Iterator<Edge> iter = g.bridges();
+		
+		while (iter.hasNext()) {
+			System.out.println(iter.next());
+		}
+		
+		System.out.println("Külgnevusmaatriks");
+		System.out.println(g.getAdjMatrix());
+		
+		iter = g.bridges();
+		if (iter.hasNext()) {
+			Edge e = iter.next();
+			System.out.printf("Eemaldame silla: %s\n", e );
+			g.removeEdge(e);
+		}
+		
+		System.out.println("Graaf:"+ g);
+		System.out.printf("Sildade arv: %d\n", g.bridgeCount());
+		
+		System.out.println("Sillad:");
+		iter = g.bridges();
+		
+		while (iter.hasNext()) {
+			System.out.println(iter.next());
+		}
+		
+		System.out.println("Külgnevusmaatriks");
+		System.out.println(g.getAdjMatrix());
+		
+		
+	}
+	
+	
+	/**
+	 * test case 6
+	 */
+	public void test6() {
+		System.out.println("Test6.");
+		System.out.println("Väidetakse, et silla leidmise algoritm on keerukusega O(E+V)\n"
+				+ "(Sedgewick & Wayne, 2016). Selle kontrollimiseks programm peab kõigepealt\n"
+				+ "mõõtma tsükli kiirust O(n). Selleks tuleb mõõta, kui kaua aega võtab\n"
+				+ "25000 elemendiga tsükli läbi käimine ning jagada tulemus 10-ga. Seejärel\n"
+				+ "luua juhuslik graaf 2500 tipu ja 7500 küljega. Võtta aega, kaua võtab sildade\n"
+				+ "leidmine. Mõõta aegade erinevust. Erinevus lahendusaegades peaks olema\n"
+				+ "realisatsiooni overhead.");
+		Graph g = createGraph("test6");
+		System.out.println("Create 10000 for loop constant time O(1)");
+		 long startTime = System.nanoTime();
+		 for(int i = 0; i<10000; i++) {
+			 g.clear();
+		 }
+		 long time_o1 = System.nanoTime() - startTime;
+		 System.out.println(time_o1);
+	
+		 System.out.println("Puu loomine");
+		 g.createRandomSimpleGraph(2500, 7500);
+		 
+		 System.out.println("Mõõdame aega sildade leidmiseks.");
+		 startTime = System.nanoTime();
+		 System.out.printf("Leitud %d sild(a) \n", g.bridgeCount());		 
+		 long time_o2 = System.nanoTime() - startTime;
+		 System.out.printf("Leitud %d komponent(i) \n", g.componentsCount());
+		 System.out.println("Aeg: "+time_o2);
+		 System.out.printf("Silla leidmise algoritmi keerukus selle katse põhjal on O(n*%.3f)", 
+				 (startTime*1.0)/(1.0*time_o2));
+		 
+	}
+	
+	private void printTimeDifference(long difference) {
+		System.out.println("Total execution time: " +
+                String.format("%d min, %d sec",
+                        TimeUnit.NANOSECONDS.toHours(difference),
+                        TimeUnit.NANOSECONDS.toSeconds(difference) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.NANOSECONDS.toMinutes(difference))));
 	}
 	
 	public Graph createGraph(String gid) {
@@ -285,10 +528,10 @@ public class GraphTask {
 		 *            - vertex identification
 		 */
 		public Vertex createVertex(String vid) {
-			
+			Vertex res;
 			// 
-			Vertex res = findVertex(vid);			
-			if (res != null) return res;
+			//res = findVertex(vid);			
+			//if (res != null) return res;
 					
 			res = new Vertex(vid);
 			res.nextVertex = first;
@@ -434,7 +677,7 @@ public class GraphTask {
 		public void createRandomSimpleGraph(int n, int m) {
 			if (n <= 0)
 				return;
-			if (n > 2500)
+			if (n > 2500*100)
 				throw new IllegalArgumentException("Too many vertices: " + n);
 			if (m < n - 1 || m > n * (n - 1) / 2)
 				throw new IllegalArgumentException("Impossible number of edges: " + m);
@@ -930,6 +1173,17 @@ public class GraphTask {
 		/**
 		 * Removes edge between vertices a and b only if edge (bidirectional connection) exist. 
 		 * Returns edge 
+		 * @param remove - edge to remove
+		 * @return removed edge or null if not found
+		 */
+		public Edge removeEdge(Edge remove) {
+			if (remove == null) return null;
+			return removeEdge(remove.a, remove.b);
+		}
+		
+		/**
+		 * Removes edge between vertices a and b only if edge (bidirectional connection) exist. 
+		 * Returns edge 
 		 * @param a - Vertex
 		 * @param b - Vertex
 		 * @return - returns Edge removed or null if not found
@@ -1036,7 +1290,7 @@ public class GraphTask {
 		@Override
 		public String toString() {
 			// TODO Auto-generated method stub
-			return String.format("e{%s->%s}", a.id, b.id);
+			return String.format("E(%s,%s)", a.id, b.id);
 		}
 		
 		@Override
