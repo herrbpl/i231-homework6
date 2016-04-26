@@ -3,29 +3,7 @@ import java.util.*;
 
 public class GraphTask {
 
-	/**
-	 * Data structure to hold Edge (Pair of vertex 1 and vertex 2)
-	 * 
-	 * @author siimaus
-	 *
-	 */
-	public class Edge {
-		protected Vertex a, b;
-
-		Edge(Vertex from, Vertex to) {
-			if (a == null || b == null) {
-				throw new IllegalArgumentException("Edge vertex cannot be null");
-			}
-			this.a = from;
-			this.b = to;
-		}
-
-		@Override
-		public String toString() {
-			// TODO Auto-generated method stub
-			return String.format("e{%s->%s}", a.id, b.id);
-		}
-	}
+	
 
 	public static void main(String[] args) {
 		GraphTask a = new GraphTask();
@@ -125,6 +103,34 @@ public class GraphTask {
 
 		}
 
+		/**
+		 * Checks if this is adjacent to b
+		 * @param b Vertex
+		 * @return true if adjacent, false if not
+		 */
+		public boolean adjacentTo(Vertex b) {
+			if (b == null) return false;
+			Iterator<Arc> iter = this.getOutArcs();
+			while (iter.hasNext()) {
+				if (iter.next().targetVertex == b) return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * Checks if <string>this</strong> is connected to <strong>b</strong>
+		 * <strong>NB!</strong> It is responsibility of caller to ensure that
+		 * graph componentsCount() is called before investigation. 
+		 * @param b 
+		 * @return true if connected, false if not
+		 * @see <a href="http://algs4.cs.princeton.edu/41graph/CC.java.html">http://algs4.cs.princeton.edu/41graph/CC.java.html</a>
+		 */
+		public boolean connectedTo(Vertex b) {
+			if (b == null ) return false;
+			if (this.componentId == -1 || b.componentId == -1) return false;
+			return (this.componentId == b.componentId);
+		}
+
 	}
 
 	/**
@@ -198,9 +204,15 @@ public class GraphTask {
 		private int componentVertexIndex[] = new int[0]; // vertexes in each
 															// component
 
+		private int bridgeCount = -1; // number of bridges in graph
+		private Stack<Edge> bridges = new Stack<Edge>(); // stack of bridges. 
+		//private Graph bridges = null; // cant use this because its not generic.  
+		
 		Graph(String s, Vertex v) {
 			id = s;
 			first = v;
+			this.bridgeCount = -1;
+			this.connectedComponents = -1;
 		}
 
 		Graph(String s) {
@@ -247,14 +259,19 @@ public class GraphTask {
 		}
 
 		/**
-		 * Creates new Vertex and adds it to top of Vertex stack.
+		 * Check if vertex exists, then return existing vertex. 
+		 * Else creates new Vertex and adds it to top of Vertex stack. 
 		 * 
 		 * @param vid
 		 *            - vertex identification
-		 * @return TODO: Replace direct set to setter
 		 */
 		public Vertex createVertex(String vid) {
-			Vertex res = new Vertex(vid);
+			
+			// 
+			Vertex res = findVertex(vid);			
+			if (res != null) return res;
+					
+			res = new Vertex(vid);
 			res.nextVertex = first;
 			first = res;
 			connectedComponents = -1;
@@ -279,10 +296,13 @@ public class GraphTask {
 											// top of stack
 			from.firstArc = res; // sets TOS to newly created Arc
 			res.targetVertex = to; // sets arc target to Vertex 'to'
-			connectedComponents = -1;
+			connectedComponents = -1; // reset count of components
+			bridgeCount = -1; // reset count of bridges
 			return res;
 		}
 
+		
+		
 		/**
 		 * Create a connected undirected random tree with n vertices. Each new
 		 * vertex is connected to some random existing vertex.
@@ -542,7 +562,7 @@ public class GraphTask {
 		 *      "http://algs4.cs.princeton.edu/41graph/Bridge.java.html">http://
 		 *      algs4.cs.princeton.edu/41graph/Bridge.java.html</a>
 		 */
-		public void findBridges() {
+		private void findBridges() {
 			final Graph self = this;
 			Object i = new Object() {
 				Graph g = self;
@@ -567,7 +587,9 @@ public class GraphTask {
 						low[v.info] = -1;
 						pre[v.info] = -1;
 						v = v.nextVertex;						
-					}										
+					}
+					self.bridgeCount = 0;
+					self.bridges.clear();
 				}
 				/**
 				 * Search for bridges
@@ -589,7 +611,7 @@ public class GraphTask {
 				void dfs(Vertex u, Vertex v) {
 					pre[v.info] = count++; // increased cycle
 					low[v.info] = pre[v.info]; // For this vertex, 
-					
+					Edge e = null;
 					// for each outgoing arc
 					Iterator<Arc> iter = v.getOutArcs();
 					while (iter.hasNext()) {
@@ -601,7 +623,10 @@ public class GraphTask {
 							   low[v.info] = Math.min(low[v.info], low[next.info]); // update minimal steps required to reach v. dfs might have found another, better way.
 							   
 							   if (low[next.info] == pre[next.info]) { // found a bridge.
-								   System.out.println(v.id+"-"+next.id + " is a bridge!");
+								   //self.
+								   e = new Edge(v, next);
+								   self.bridges.push(e);	
+								   self.bridgeCount++;
 							   }
 							   
 						   } else { // next is already visited by something. 
@@ -621,6 +646,389 @@ public class GraphTask {
 
 		}
 
+		/**
+		 * Wrapped class around Stack iterator. We need to mask remove method.
+		 * @author siimaus
+		 *
+		 */
+		class EdgeIterator implements Iterator<Edge> {
+			Graph g;
+			Iterator<Edge> e;
+			public EdgeIterator(Graph g) {
+				// TODO Auto-generated constructor stub
+				this.g = g;
+				this.e = g.bridges.iterator();
+			}
+			@Override
+			public boolean hasNext() {
+				// TODO Auto-generated method stub
+				return e.hasNext();
+			}
+
+			@Override
+			public Edge next() {
+				// TODO Auto-generated method stub
+				return e.next();
+			}
+			
+			@Override
+			public void remove() {
+				// TODO Auto-generated method stub
+				throw new UnsupportedOperationException();
+			}
+		}
+		
+		public int bridgeCount() {
+			if (this.bridgeCount <0) {
+				this.findBridges();
+			}
+			return this.bridgeCount;
+		}
+		/**
+		 * Returns iterator over bridges in graph.<br> 
+		 * <strong>NB!</strong> Wrapping iterator is used to remove access to iterator remove method 
+		 * @return Iterator over bridges found
+		 */
+		public Iterator<Edge> bridges() {
+			if (this.bridgeCount <0) {
+				this.findBridges();
+			}
+			return new EdgeIterator(this);
+		}
+		
+		/**
+		 * Should i provide indexOf(Vertex) ? Should i keep internal index? its memory vs speed
+		 * @param search Vertex to be searched
+		 * @return position in stack
+		 */
+		public int indexOf(Vertex search) {
+			info = 0;
+			Vertex v = first;
+			while (v != null) {
+				if (v == search) {
+					return info;
+				}
+				info++;
+				v = v.nextVertex;
+			}
+			return -1;
+		}
+		
+		/**
+		 * Finds Vertex by id and returns it or returns null
+		 * This method is mainly useful for checking and manual graph building
+		 * @param vertexid
+		 * @return Vertex if found or null
+		 */
+		public Vertex findVertex(String vertexid) {
+			Vertex v = first;
+			while (v != null) {
+				// always use .equals. Where I have case where == operator did not find equality of strings!
+				if (v.id.equals(vertexid)) {
+					return v;
+				}				
+				v = v.nextVertex;
+			}
+			return null;
+		}
+		
+		/**
+		 * Removes Arc from vertex
+		 * @param from Vertex that contain Arc
+		 * @param a Arc that is to be removed
+		 * @return 
+		 */
+		public Arc removeArc(Vertex from, Arc a) {
+			// stack: tos -> next1 -> next2 -> null
+			// remove tos => tos = tos->next1
+			// remove tos ->next => tos->next = next1->next
+			// remove next2 => next1->next = null
+			
+			
+			if (a == null) {
+				// should i throw error or silently succeed?
+				throw new NoSuchElementException("Cannot remove null argument!");
+			}
+
+			if (from == null) {
+				throw new IllegalArgumentException("Cannot remove from null argument!");
+			}
+			
+			Arc current = from.firstArc;
+			 
+			if (a == from.firstArc) {
+				// remove target				
+				from.firstArc = from.firstArc.nextArc;
+				
+				this.bridgeCount = -1;
+				this.connectedComponents = -1;
+				
+				return current; 
+			}
+									
+			while (current != null) {
+				
+				if (a == current.nextArc) {
+					// set current nextArc to next
+					
+					Arc result = current.nextArc;
+					current.nextArc = current.nextArc.nextArc;
+					
+					this.bridgeCount = -1;
+					this.connectedComponents = -1;
+					
+					return result;
+				}
+				current = current.nextArc;
+			}					
+			// not found
+			return null;
+		}
+		
+		/**
+		 * Removes (first) Arc from from to to
+		 * @param from Vertex from
+		 * @param to Vertex to
+		 * @return Arc removed
+		 */
+		public Arc removeArc(Vertex from, Vertex to) {
+			// stack: tos -> next1 -> next2 -> null
+			// remove tos => tos = tos->next1
+			// remove tos ->next => tos->next = next1->next
+			// remove next2 => next1->next = null
+
+			if (from == null) {
+				throw new IllegalArgumentException("Cannot remove from null argument!");
+			}
+			
+			// no outgoing arc from this vertex
+			if (from.firstArc == null) {
+				return null;
+			}
+										
+			Arc current = from.firstArc;
+
+			if (to == from.firstArc.targetVertex) {
+				// remove target
+				from.firstArc = from.firstArc.nextArc;
+				this.bridgeCount = -1;
+				this.connectedComponents = -1;
+				return current;
+			}
+
+			while (current != null) {
+				
+				if (current.nextArc != null &&  to == current.nextArc.targetVertex) {
+					
+					Arc result = current.nextArc;
+					// set current nextArc to next
+					current.nextArc = current.nextArc.nextArc;
+					
+					this.bridgeCount = -1;
+					this.connectedComponents = -1;
+					
+					return result;
+				}
+				current = current.nextArc;
+			}
+			// not found
+			return null;
+		}
+		
+		/**
+		 * Remove vertex from graph. This means removing all arcs pointing to it 
+		 * and all arcs it points to 
+		 * @param remove - vertex to be removed
+		 * @return removed vertex or null if nothing found
+		 */
+		public Vertex removeVertex(Vertex remove) {
+			
+			Vertex current = this.first;
+			
+			// remove incoming arcs
+			while (current != null) {
+				this.removeArc(current, remove);
+				current = current.nextVertex;						
+			}
+			
+			// remove vertex from stack
+			current = this.first;
+			 
+			if (remove == first) {
+				// remove target				
+				first = first.nextVertex;
+				
+				this.bridgeCount = -1;
+				this.connectedComponents = -1;
+				
+				return current; 
+			}
+									
+			while (current != null) {
+				
+				if (remove == current.nextVertex) {
+					// set current nextArc to next
+					
+					Vertex result = current.nextVertex;
+					current.nextVertex = current.nextVertex.nextVertex;
+					
+					this.bridgeCount = -1;
+					this.connectedComponents = -1;
+					
+					return result;
+				}
+				current = current.nextVertex;
+			}					
+			// not found
+			return null;
+		}
+		
+		
+		/**
+		 * Creates edge between two vertices. This method is created for invoncinience
+		 * @param a  Vertex 1
+		 * @param b  Vertex 2 
+		 * @return
+		 */
+		public Edge createEdge(Vertex a, Vertex b) {
+			if (a == null || b == null) {
+				throw new IllegalArgumentException("Cannot accept null vertexes");
+			}
+			Arc a1 = createArc("a_"+a.toString()+"_"+b.toString(), a, b);
+			Arc a2 = createArc("a_"+b.toString()+"_"+a.toString(), b, a);
+			return new Edge(a, b);
+		}
+		/**
+		 * Creates edge between two vertices given by their id-s
+		 * @param a
+		 * @param b
+		 * @return
+		 */
+		public Edge createEdge(String a, String b) {
+			return createEdge(findVertex(a), findVertex(b));
+		}
+		
+		/**
+		 * Removes edge between vertices a and b only if edge (bidirectional connection) exist. 
+		 * Returns edge 
+		 * @param a - Vertex
+		 * @param b - Vertex
+		 * @return - returns Edge removed or null if not found
+		 */
+		public Edge removeEdge(Vertex a, Vertex b) {
+			if (!this.hasEdge(a,b)) { return null; }
+			removeArc(a,b);
+			removeArc(b,a);
+ 			return new Edge(a, b);
+		}
+		
+		/**
+		 * Removes edge between vertices a and b only if edge (bidirectional connection) exist. 
+		 * Returns edge 
+		 * @param a - Vertex a id
+		 * @param b - Vertex b id
+		 * @return - returns Edge removed or null if not found
+		 */
+		public Edge removeEdge(String a, String b) {
+			return removeEdge(findVertex(a), findVertex(b));
+		}
+		
+
+		/**
+		 * Checks if there is edge between two vertices
+		 * @param a - Vertex
+		 * @param b - Vertex
+		 * @return true of edge, false if not 
+		 */
+		public boolean hasEdge(Vertex a, Vertex b) {
+			// TODO Auto-generated method stub
+			return (a.adjacentTo(b) && b.adjacentTo(a));
+		}
+		
+		/**
+		 * Checks if edge is bridge
+		 * @param edge Edge between vertices		 
+		 * @return 
+		 */		
+		public boolean isBridge(Edge edge) {
+			Iterator<Edge> iter = bridges();
+			Edge bridge = null;
+			
+			while (iter.hasNext()) {
+				bridge = iter.next();
+				if (bridge.equals(edge)) return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * Checks if edge is bridge
+		 * @param a Vertex
+		 * @param b Vertex
+		 * @return 
+		 */
+		public boolean isBridge(Vertex a, Vertex b) {			
+			Edge e = new Edge(a, b);
+			return isBridge(e);			
+		}
+		/**
+		 * Checks if edge is bridge
+		 * @param a id of Vertex a
+		 * @param b id of Vertex b
+		 * @return
+		 */
+		public boolean isBridge(String a, String b) {
+			return isBridge(findVertex(a),findVertex(b));
+		}
+		
+		
+		/** Removes all vertices and arcs from graph.
+		 *  I wonder, what happens to all those abandoned pointers ? This explains it
+		 *  @see <a href="http://stackoverflow.com/questions/2086759/java-collections-and-garbage-collector">http://stackoverflow.com/questions/2086759/java-collections-and-garbage-collector</a> 
+		 *  
+		 */
+		public void clear() {
+			this.first = null;
+			this.bridgeCount = -1;
+			this.connectedComponents = -1;
+			
+		}
+		
+	}
+	
+	/**
+	 * Data structure to hold Edge (Pair of vertex 1 and vertex 2).
+	 * Currently it does not distinct between parallel edges, its all the same if vertices match
+	 * 
+	 * @author siimaus
+	 *
+	 */
+	public class Edge {
+		protected Vertex a, b;
+
+		Edge(Vertex a, Vertex b) {
+			if (a == null || b == null) {
+				throw new IllegalArgumentException("Edge vertex cannot be null");
+			}
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return String.format("e{%s->%s}", a.id, b.id);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null) return false;
+			if (!( obj instanceof Edge)) return false;
+			Edge e = (Edge)obj;
+			if ((this.a == e.a && this.b == e.b) || (this.a == e.b && this.b == e.a)) return true;
+			return false;
+		}
+		
 	}
 
 }
