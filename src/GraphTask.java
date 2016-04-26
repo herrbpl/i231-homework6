@@ -1,14 +1,19 @@
 
 import java.util.*;
-
+/**
+ * This class runs given tasks on Graph
+ * My given task was to find all bridges in undirected simple graph.
+ * 
+ * @author siimaus
+ *
+ */
 public class GraphTask {
 
 	
 
 	public static void main(String[] args) {
 		GraphTask a = new GraphTask();
-		a.run();
-		throw new RuntimeException("Nothing implemented yet!"); // delete this
+		a.run();		
 	}
 
 	public void run() {
@@ -19,6 +24,20 @@ public class GraphTask {
 		// TODO!!! Your experiments here
 	}
 
+	/**
+	 * Test case 1. 
+	 */
+	public void test1() {
+		
+	}
+	
+	/**
+	 * test case 2
+	 */
+	public void test2() {
+		
+	}
+	
 	public Graph createGraph(String gid) {
 		return new Graph(gid);
 	}
